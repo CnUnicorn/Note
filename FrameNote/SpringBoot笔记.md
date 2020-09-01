@@ -808,3 +808,54 @@ SpringBoot帮我们配置了什么？我们能不能进行修改？能修改哪�
 
 * **xxxxAutoConfiguration：**根据条件（`@Conditional`注解），向容器中装配组件
 * **xxxxProperties：**配置类（组件），可以向其中注入yaml文件中自定义的内容；由**xxxxAutoConfiguration装配到容器中。
+
+**其中WebMVC配置全部在WebMvcAutoConfiguration中配置**。
+
+
+
+## 8.1 静态资源处理
+
+项目中的静态资源，如css，js等文件
+
+**WebMvcAutoConfiguration**的源码分析见：https://mp.weixin.qq.com/s/vYbEYlveseIGWWL_eEM36w
+
+
+
+以下四个存放静态资源的目录可以被识别：
+
+classpath为工程目录，但习惯上静态资源目录全部存放在resources目录下
+
+```java
+"classpath:/META-INF/resources/"   // webjars包下的文件
+"classpath:/resources/"            // resources目录下的名称为resources的文件夹（需要创建）
+"classpath:/static/"               // resources目录下的名称为static的文件夹
+"classpath:/public/"               // resources目录下的名称为public的文件夹（需要创建）
+```
+
+
+
+也可以在ymal配置文件中自定义静态文件的存放目录，此时，上面默认的静态文件存放目录全部失效：
+
+```java
+spring.resources.static-locations=classpath:/coding/,classpath:/maowei/
+```
+
+一般不会重新配置静态文件存放的目录
+
+
+
+## 8.2 首页和图标定制
+
+在static文件夹中新建index.html文件
+
+此时，会自动映射到静态文件目录下的index.html文件
+
+进入 localhost:8080/ 会自动显示index.html的内容
+
+![image-20200831210541534](D:\Typora\笔记图片\SpringBoot笔记\image-20200831210541534.png)
+
+
+
+## 8.3 Thymeleaf
+
+![image-20200831214828467](D:\Typora\笔记图片\SpringBoot笔记\image-20200831214828467.png)
