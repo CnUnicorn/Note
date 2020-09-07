@@ -771,6 +771,23 @@ Spring MVC 的 `@RequestMapping` 注解能够处理 HTTP 请求的方法, 比如
 
 
 
+**注意点：**
+
+重定向语法中，冒号和重定向的地址之间不能有空格，否则路径拼接会出现问题。
+
+```java
+@GetMapping("/test")
+public String test() {
+    return "redirect:/user/login"; // 正确用法
+    return "redirect: /user/login"; // 错误写法，拼接的时候空格会被当成路径的一部分
+}
+
+```
+
+
+
+
+
 跳转的页面：**{视图解析器前缀} + viewName(使用注解时，是控制器中方法返回的名称) + {视图解析器后缀}**
 
 Sping配置文件中视图解析器的配置：

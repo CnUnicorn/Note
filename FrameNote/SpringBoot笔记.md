@@ -49,6 +49,10 @@ Spring Boot 基于 Spring 开发，**Spirng Boot 本身并不提供 Spring 框�
 
 # 2. 第一个SpringBoot程序
 
+注意点：IDEA设置里File Encoding全部设置成UTF-8，否则很多配置会出错。
+
+
+
 两种方法初始化项目：
 
 首先确定项目环境（我自己的环境）：
@@ -858,4 +862,270 @@ spring.resources.static-locations=classpath:/coding/,classpath:/maowei/
 
 ## 8.3 Thymeleaf
 
+**模板引擎**：
+
+springboot支持的前端页面是html，不是jsp页面。如果使用jsp，可以用jsp处理转发到前端的数据。
+
+springboot推荐使用模板引擎Thymeleaf：
+
+模板引擎的作用就是我们来写一个页面模板，比如有些值呢，是动态的，我们写一些表达式。而这些值，从哪来呢，就是我们在后台封装一些数据。然后把这个模板和这个数据交给我们模板引擎，模板引擎按照我们这个数据帮你把这表达式解析、填充到我们指定的位置，然后把这个数据最终生成一个我们想要的内容给我们写出去，这就是我们这个模板引擎，不管是jsp还是其他模板引擎，都是这个思想。
+
+下图是Thymeleaf的示意图：
+
+![微信图片_20200901164200](D:\Typora\笔记图片\SpringBoot笔记\微信图片_20200901164200.png)
+
+
+
+**引入Thymeleaf的几种方式：**
+
+Thymeleaf 官网：https://www.thymeleaf.org/
+
+Thymeleaf 在Github 的主页：https://github.com/thymeleaf/thymeleaf
+
+Spring官方文档：找到我们对应的版本
+
+https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#using-boot-starter 
+
+引入pom依赖：
+
+```xml
+<!--thymeleaf-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+
+注意在maven仓库中找到的Spring Boot Starter Thymeleaf是2.X版本的。而SpringBoot父依赖中的Thymeleaf默认版本是3.X版本的，如果导入了2.X版本的Thymeleaf一定会出现问题。
+
+
+
+根据Spring Boot自动配置的原理，查看ThymeleafProperties自动配置类，发现前缀和后缀固定为templates文件夹和html文件，所以前端的html文件需要放在templates文件夹下。
+
 ![image-20200831214828467](D:\Typora\笔记图片\SpringBoot笔记\image-20200831214828467.png)
+
+
+
+**Thymeleaf语法：**参考官方文档是最直接的方法
+
+以下是一个简单的测试用例：
+
+1. Controller增加传输数据亲贵
+
+   ```java
+   @Controller
+   public class IndexController {
+   
+       @RequestMapping("/index")
+       public String index(Model model) {
+           model.addAttribute("msg", "<h1>Hello,there!</h1>"); // 传递字符串
+           model.addAttribute("users", Arrays.asList("xumaowei", "徐茂蔚")); // 传递列表
+           return "test";
+       }
+   }
+   ```
+
+   
+
+2. 要使用Thymeleaf需要在html命名空间中导入约束
+
+   ```html
+   xmlns:th="http://www.thymeleaf.org"
+   ```
+
+
+
+3. 对应的前端测试页面
+
+   ```html
+   <!DOCTYPE html>
+   <html lang="en"  xmlns:th="http://www.thymeleaf.org">
+   <head>
+       <meta charset="UTF-8">
+       <title>Title</title>
+   </head>
+   <body>
+   <!--传递单纯的字符串，自动转义-->
+   <div th:text="${msg}"></div>
+   <!--不转义，字符串中的内容按照html语法解析-->
+   <div th:utext="${msg}"></div>
+   
+   <div th:each="user :${users}" th:text="${user}"></div>
+   </body>
+   </html>
+   ```
+
+4. 测试结果
+
+   <img src="D:\Typora\笔记图片\SpringBoot笔记\image-20200901165523704.png" alt="image-20200901165523704" style="zoom:67%;" />
+
+文档中的Thymeleaf语法：
+
+1. 可以使用 **th:attr** 替换原生html中原生属性的值
+
+   ![thymeleaf语法](D:\Typora\笔记图片\SpringBoot笔记\thymeleaf语法.jpg)
+
+2. Thymeleaf表达式（对应官方文档第四章Standard Expression Syntax）
+
+   ```
+   Simple expressions:（表达式语法）
+   Variable Expressions: ${...}：获取变量值；OGNL；
+       1）、获取对象的属性、调用方法
+       2）、使用内置的基本对象：#18
+            #ctx : the context object.
+            #vars: the context variables.
+            #locale : the context locale.
+            #request : (only in Web Contexts) the HttpServletRequest object.
+            #response : (only in Web Contexts) the HttpServletResponse object.
+            #session : (only in Web Contexts) the HttpSession object.
+            #servletContext : (only in Web Contexts) the ServletContext object.
+   
+       3）、内置的一些工具对象：
+   　　　　　　#execInfo : information about the template being processed.
+   　　　　　　#uris : methods for escaping parts of URLs/URIs
+   　　　　　　#conversions : methods for executing the configured conversion service (if any).
+   　　　　　　#dates : methods for java.util.Date objects: formatting, component extraction, etc.
+   　　　　　　#calendars : analogous to #dates , but for java.util.Calendar objects.
+   　　　　　　#numbers : methods for formatting numeric objects.
+   　　　　　　#strings : methods for String objects: contains, startsWith, prepending/appending, etc.
+   　　　　　　#objects : methods for objects in general.
+   　　　　　　#bools : methods for boolean evaluation.
+   　　　　　　#arrays : methods for arrays.
+   　　　　　　#lists : methods for lists.
+   　　　　　　#sets : methods for sets.
+   　　　　　　#maps : methods for maps.
+   　　　　　　#aggregates : methods for creating aggregates on arrays or collections.
+   ==================================================================================
+   
+     Selection Variable Expressions: *{...}：选择表达式：和${}在功能上是一样；
+     Message Expressions: #{...}：获取国际化内容
+     Link URL Expressions: @{...}：定义URL；
+     Fragment Expressions: ~{...}：片段引用表达式
+   
+   Literals（字面量）
+         Text literals: 'one text' , 'Another one!' ,…
+         Number literals: 0 , 34 , 3.0 , 12.3 ,…
+         Boolean literals: true , false
+         Null literal: null
+         Literal tokens: one , sometext , main ,…
+         
+   Text operations:（文本操作）
+       String concatenation: +
+       Literal substitutions: |The name is ${name}|
+       
+   Arithmetic operations:（数学运算）
+       Binary operators: + , - , * , / , %
+       Minus sign (unary operator)（负号，一元运算符）: -
+       
+   Boolean operations:（布尔运算）
+       Binary operators: and , or
+       Boolean negation (unary operator): ! , not
+       
+   Comparisons and equality:（比较运算）
+       Comparators: > , < , >= , <= ( gt , lt , ge , le )
+       Equality operators: == , != ( eq , ne )
+       
+   Conditional operators:条件运算（三元运算符）
+       If-then: (if) ? (then)
+       If-then-else: (if) ? (then) : (else)
+       Default: (value) ?: (defaultvalue)
+       
+   Special tokens:
+       No-Operation: _
+   ```
+
+   
+
+## 8.4 MVC自动配置
+
+（写得很乱，具体参考：https://mp.weixin.qq.com/s/9AY48uLjR9bI9TUlulcBNA）
+
+SpringMVC自动配置官方文档：
+
+https://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/html/boot-features-developing-web-applications.html#boot-features-spring-mvc-auto-configuration
+
+SpringBoot为大多数应用提供了比较好用的Spring MVC自动配置。
+
+
+
+自动配置在Spring默认设置上添加了以下功能：
+
+- Inclusion of `ContentNegotiatingViewResolver` and `BeanNameViewResolver` beans.
+
+  - （包含视图解析器）
+
+- Support for serving static resources, including support for WebJars（支持静态资源文件，包括webJars）
+
+- Automatic registration of `Converter`, `GenericConverter`, and `Formatter` beans.
+
+  - （自动注册转换器Converter：网页提交数据到后台自动封装成为对象的东西，比如把“1”字符串自动转换成int
+
+  ​	格式化器Formatter：比如页面返回了一个2019-08-01，自动格式化成Date对象）
+
+- Support for `HttpMessageConverters`
+
+  - （SpringMVC用来转换Http请求和响应的的，比如我们要把一个User对象转换为JSON字符串，可以去看官网文档解释）
+
+- Automatic registration of `MessageCodesResolver` 
+
+  - （定义错误代码生成规则）
+
+- Static `index.html` support.
+
+  - （首页定制）
+
+- Custom `Favicon` support
+
+  - （图标定制）
+
+- Automatic use of a `ConfigurableWebBindingInitializer` bean 
+
+  - （初始化数据绑定器：帮我们把请求数据绑定到JavaBean中）
+
+如果希望保持Spring Boot MVC的特性，同时添加额外的MVC配置（拦截器，格式化器，视图控制器和其他特性），可以添加带有 `@Configuration` 注解的Java配置类（实现 `WebMvcConfigurer` 接口），**不要添加** `EnableWebMvc` 注解，**如果添加了这个注解，所有默认的配置都会失效，全面接管SpringMVC，只使用用户自己的SpringMVC配置**。
+
+如果想要提供自定义的 `RequestMappinghandlerMapping` ，`RequestMappingHandlerAdapter` 或者 `ExceptionHandlerExceptionResolver` ，可以声明一个 `WebMvcRegistrationAdapter` 实例提供组件。
+
+
+
+以下是文档中的原文：	
+
+If you want to keep Spring Boot MVC features and you want to add additional [MVC configuration](https://docs.spring.io/spring/docs/5.1.8.RELEASE/spring-framework-reference/web.html#mvc) (interceptors, formatters, view controllers, and other features), you can add your own `@Configuration` class of type `WebMvcConfigurer` but **without** `@EnableWebMvc`. If you wish to provide custom instances of `RequestMappingHandlerMapping`, `RequestMappingHandlerAdapter`, or `ExceptionHandlerExceptionResolver`, you can declare a `WebMvcRegistrationsAdapter` instance to provide such components. 
+
+
+
+就是说如果想要扩展SpringMVC的配置，只需要编写相应的Java配置类，并添加到容器中。Spring Boot在自动配置很多组件的时候，先看容器中有无用户自己配置的，如果有用户自己配置的，则优先使用用户的配置
+
+另外，当容器中有多个配置时，比如视图解析器，就当默认配置和用户的配置组合起来。
+
+如下，是自己配置的视图解析器，SpringBoot将容器中所有的视图解析器收集起来，并选择使用最好的那个视图解析器。
+
+```java
+@Configuration
+public class MyMvcConfig implements WebMvcConfigurer {
+
+    @Bean
+    public ViewResolver myViewResolver() {
+        return new MyViewResolver();
+    }
+
+    private static class MyViewResolver implements ViewResolver {
+        public View resolveViewName(String s, Locale locale) {
+            return null;
+        }
+    
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/test").setViewName("test"); // 指定某个url转发到指定的
+                                                                 // html页面
+    }
+    }
+}
+
+在配置文件中使用addViewController方法，效果等价于：
+@RequestMapping("/test")
+public String test() {
+    return "test";
+}
+```
+
