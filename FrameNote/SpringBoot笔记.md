@@ -733,7 +733,7 @@ java -jar spring-boot-config.jar --spring.config.location=F:/application.propert
 
 5. 个人目前的理解：**自动配置类和properties类**本质上都是JavaConfig类（包含 `@Configuration` 注解）；
 
-   properties类就是自动配置类中组件，自动配置类通过 `@ConditionalOnxxx` 注解判断是否加载某些组件（xxxProperties类）。properties类通过与ymal配置文件绑定向类中注入属性；
+   properties类就是自动配置类中的组件，自动配置类通过 `@ConditionalOnxxx` 注解判断是否加载某些组件（xxxProperties类）。properties类通过与ymal配置文件绑定向类中注入属性；
 
    之前是，直接在xml配置中配置所有东西。**现在通过在yamal文件中配置JavaConfig**。
 
@@ -1178,7 +1178,7 @@ Github地址：https://github.com/alibaba/druid/
 
 
 
-# 9.2 Druid数据源的使用
+## 9.2 Druid数据源的使用
 
 **1. 添加Druid数据源依赖：**
 
@@ -1359,3 +1359,136 @@ public class DruidConfig {
     }
 }
 ```
+
+
+
+# 10. SpringBoot整合Mybatis
+
+MVC:
+
+M：数据和业务
+
+V：视图，前端
+
+C：前端和后端的交接
+
+
+
+1. 导入包，在pom.xml中引入Mybatis依赖
+
+   ```xml
+   <!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+   <dependency>
+       <groupId>org.mybatis.spring.boot</groupId>
+       <artifactId>mybatis-spring-boot-starter</artifactId>
+       <version>2.1.1</version>
+   </dependency>
+   ```
+
+   
+
+2. 配置文件，在yml配置文件中配置Mybatis和数据库连接
+
+   ```yaml
+   spring:
+     datasource:
+       username: root
+       password: 3.1415926
+       url: jdbc:mysql://localhost:3306/mybatis?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+       driver-class-name: com.mysql.cj.jdbc.Driver
+   
+   mybatis:
+     mapper-locations: classpath:mapper/*.xml 
+     # 注意classpath冒号后面直接接文件路径，不需要额外的/，
+     # classpath:/mapper/*.xml这种写法无法建立映射
+     type-aliases-package: com.maowei.pojo
+     # 别名设置，包路径下的实体类可以直接使用类名
+   ```
+
+   
+
+3. 编写sql（创建Mappler接口和Mapper.xml文件）
+
+   <img src="笔记图片/SpringBoot笔记/image-20200912094343218.png" alt="image-20200912094343218"  />
+
+   **Mapper接口**：
+
+   ```java
+   @Mapper
+   @Repository
+   // Mapper接口中这两个注解不能缺少，@Repository是为了注册Bean，在容器中可以直接得到接口bean
+   // @Mapper是为了标记这个接口是Mybatis映射接口
+   public interface UserMapper {
+   
+       List<User> queryUserList();
+   
+       User queryUserById(int id);
+   
+       int addUser(User user);
+   
+       int updateUser(User user);
+   
+       int deleteUser(int id);
+   }
+   ```
+
+   **Mapper.xml文件：**
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!--绑定一个Dao/Mapper接口-->
+   <mapper namespace="com.maowei.mapper.UserMapper">
+       <select id="queryUserById" resultType="User" parameterType="int">
+       	select * from users where id = #{id};
+     	</select>
+   
+       <select id="queryUserList" resultType="User">
+           select * from users;
+       </select>
+   
+       <select id="addUser" parameterType="User" resultType="int">
+           insert into users(id, name, pwd) values(#{id},#{name},#{pwd});
+       </select>
+   
+       <select id="updateUser" parameterType="com.maowei.pojo.User" resultType="int">
+           update users set name=#{name},pwd=#{pwd} where id=#{id};
+       </select>
+   
+       <delete id="deleteUser" parameterType="int">
+           delete from users where id=#{id};
+       </delete>
+   
+   </mapper>
+   ```
+
+   
+
+4. service层调用dao层
+
+   为了方便，这里不使用service层
+
+   
+
+5. controller调用service层
+
+   暂时直接使用Controller完成业务
+
+   ```java
+   @RestController
+   public class UserController {
+   
+       @Autowired
+       private UserMapper userMapper;
+   
+       @RequestMapping("/getUser/{id}")
+       public User getUserById(@PathVariable("id") Integer id) {
+           return userMapper.queryUserById(id);
+       }
+   }
+   ```
+
+   
+
