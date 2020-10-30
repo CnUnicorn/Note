@@ -285,6 +285,8 @@ public SpringApplication(ResourceLoader resourceLoader, Class... primarySources)
 
 # 4. yaml配置注入
 
+
+
 ## 4.1 SpringBoot配置文件：
 
 SpringBoot使用一个全局配置文件，配置文件的名称是固定的
@@ -295,7 +297,7 @@ SpringBoot使用一个全局配置文件，配置文件的名称是固定的
 
 * application.yml
 
-  语法：key:：value （冒号后面有一个空格，yml对空格要求很严格）
+  语法：key: value （冒号后面有一个空格，yml对空格要求很严格）
 
 
 
@@ -340,7 +342,7 @@ YAML是 "YAML Ain't a Markup Language" （YAML不是一种标记语言）的递�
 
 **字面量：普通的值  [ 数字，布尔值，字符串  ]**
 
-字面量直接写在后面就可以 ， 字符串默认不用加上双引号或者单引号
+字面量直接写在后面就可以 ， **字符串默认不用加上双引号或者单引号**
 
 如：
 
@@ -352,7 +354,7 @@ k: v
 
 - “ ” 双引号，不会转义字符串里面的特殊字符 ， 特殊字符会作为本身想表示的意思；
 
-  比如 ：name: "kuang \n shen"  输出 ：kuang  换行  shen
+  比如 ：name: "maowei \n xu"  输出 ：maowei 换行  xu
 
 - ' ' 单引号，会转义特殊字符 ， 特殊字符最终会变成和普通字符一样输出
 
@@ -541,7 +543,7 @@ erson:
 
 **小结：**
 
-`@Configuration` 注解和 `@Value` 注解的区别
+`@ConfigurationProperties` 注解和 `@Value` 注解的区别
 
 ![微信图片_20200820091613](.\笔记图片\SpringBoot笔记\微信图片_20200820091613.png)
 
