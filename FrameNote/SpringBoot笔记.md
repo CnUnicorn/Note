@@ -285,6 +285,16 @@ public SpringApplication(ResourceLoader resourceLoader, Class... primarySources)
 
 # 4. yaml配置注入
 
+好玩的东西：
+
+在resources目录下添加一个banner.txt文件，然后在banner生成网站上把想要生成的banner拷贝进去，springboot会自动替换成新的banner。
+
+**也可以放一个空的banner.txt，这样的话可以消除控制台的banner**
+
+![image-20201102095303723](SpringBoot笔记.assets/image-20201102095303723.png)
+
+
+
 
 
 ## 4.1 SpringBoot配置文件：
@@ -551,7 +561,7 @@ erson:
 
 2、松散绑定：这个什么意思呢? 比如我的yml中写的last-name，这个和lastName是一样的， - 后面跟着的字母默认是大写的。这就是松散绑定。可以测试一下
 
-3、JSR303数据校验 ， 这个就是我们可以在字段是增加一层过滤器验证 ， 可以保证数据的合法性
+3、JSR303数据校验 ， 这个就是我们可以在字段增加一层过滤器验证 ， 可以保证数据的合法性
 
 4、复杂类型封装，yml中可以封装对象 ， 使用value就不支持
 
@@ -561,7 +571,7 @@ erson:
 
 SpringBoot中可以使用 `@Validated` 注解来校验数据，如果数据不符合要求，会统一抛出异常，方便异常中心统一处理。
 
-**注意：**使用JSR303校验，一定要在类上加上 `@Validated` 注解，否则即便加上了其他注解，校验也不会生效
+**注意：**使用JSR303校验，一定要在**类上**加上 `@Validated` 注解，否则即便加上了其他注解，校验也不会生效
 
 如： `@Max` 限制数值最大值，`@Email` 限制字符格式为邮箱地址
 
@@ -662,8 +672,6 @@ server:
   port: 8082
 spring:
   profiles: test
-
-
 ```
 
 
@@ -702,8 +710,8 @@ spring.profiles.active=dev
 1. `file:./config/`                                         项目路径下的config文件夹中的配置文件
 
 2. `file:./`                                                        项目路径下的配置文件
-3. `classpath:./config/`                               类路径下（resources文件夹下）的config文件夹中的配置文件
-4. `classpath:./`                                              类路径下（resources文件夹下）的配置文件
+3. `classpath:./config/`                               **类路径下（resources文件夹下）**的config文件夹中的配置文件
+4. `classpath:./`                                              **类路径下（resources文件夹下）**的配置文件
 
 **3，4优先级中的类路径（java文件夹或resources文件夹下）实际上是指resources文件夹下，如果配置文件在类路径中，习惯上放在资源目录下。**
 
@@ -735,7 +743,7 @@ java -jar spring-boot-config.jar --spring.config.location=F:/application.propert
 
 5. 个人目前的理解：**自动配置类和properties类**本质上都是JavaConfig类（包含 `@Configuration` 注解）；
 
-   properties类就是自动配置类中的组件，自动配置类通过 `@ConditionalOnxxx` 注解判断是否加载某些组件（xxxProperties类）。properties类通过与ymal配置文件绑定向类中注入属性；
+   properties类就是自动配置类中的组件，自动配置类通过 `@ConditionalOnxxx` 注解判断是否加载某些组件（xxxProperties类）。properties类通过与ymal配置文件绑定向properties类中注入属性；
 
    之前是，直接在xml配置中配置所有东西。**现在通过在yamal文件中配置JavaConfig**。
 
@@ -745,8 +753,8 @@ java -jar spring-boot-config.jar --spring.config.location=F:/application.propert
 
   **自动配置类总结** ：**根据当前不同的条件判断，决定这个配置类是否生效！**
 
-  - 一但这个配置类生效；这个配置类就会给容器中添加各种组件；
-  - 这些组件的属性是从对应的properties类中获取的，这些类里面的每一个属性又是和配置文件绑定的；
+  - 一但这个配置类生效，这个配置类就会给容器中添加各种组件；
+  - 这些组件的属性是从对应的properties类中获取的，这些类里面的每一个属性又是和配置文件绑定的（如果yml配置文件中没有显式地指定值，使用默认的属性）；
   - 所有在yamal配置文件中配置的属性都是在xxxxProperties类中封装着；
   - 配置文件能配置什么就可以参照某个功能对应的这个属性类
 
@@ -773,7 +781,7 @@ java -jar spring-boot-config.jar --spring.config.location=F:/application.propert
 | @ConditionalOnMissingBean       | 容器中不存在指定Bean                             |
 | @ConditionalOnExpression        | 满足SpEL表达式指定                               |
 | @ConditionalOnClass             | 系统中有指定的类                                 |
-| @ConditionalOnMissingClass      | 系统中没有指定的类                               |
+| @ConditionalOnMissingClass      | 系统中(classpath里)没有指定的类                  |
 | @ConditionalOnSingleCandidate   | 容器中只有一个指定的Bean，或者这个Bean是首选Bean |
 | @ConditionalOnProperty          | 系统中指定的属性是否有指定的值                   |
 | @ConditionalOnRsource           | 类路径下是否存在指定资源                         |
@@ -796,13 +804,13 @@ debug=true
 
 **Positive matches：**查看启用的自动配置类
 
-![image-20200824212141488](D:\Typora\笔记图片\SpringBoot笔记\image-20200824212141488.png)
+![image-20200824212141488](.\笔记图片\SpringBoot笔记\image-20200824212141488.png)
 
 
 
 **Negitive matches：**查看没有启用的自动配置类
 
-![image-20200824212258778](D:\Typora\笔记图片\SpringBoot笔记\image-20200824212258778.png)
+![image-20200824212258778](.\笔记图片\SpringBoot笔记\image-20200824212258778.png)
 
 
 
