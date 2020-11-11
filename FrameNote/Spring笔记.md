@@ -551,7 +551,7 @@ xmlns:c="http://www.springframework.org/schema/c"
   * 和基于构造的注入一样。使用c命名空间，省去了`<construct-arg/>`标签
 
     ```xml
-    <bean id="userc" class="com.maowei.pojo.User" c:age="18" c:name="xmmw"/>
+    <bean id="userc" class="com.maowei.pojo.User" c:age="18" c:name="xmw"/>
     ```
 
 
@@ -1000,7 +1000,9 @@ public class User {
 
     @Value("xmw")
     private String name;
-
+	
+    private Dog dog;
+    
     public String getName() {
         return name;
     }
@@ -1039,8 +1041,15 @@ public class UserConfig {
     // 这个方法的名字，相当于<bean/>标签中的id属性
     // 方法的返回类型，相当于<bean/>标签中的class属性
     @Bean
-    public User user() {
-        return new User(); //返回需要注入到bean中的对象
+    public User user(Dog dog) {
+        User user = new User();
+        user.setDog(dog);
+        return user //返回需要注入到bean中的对象
+    }
+    
+    @Bean
+    public Dog dog() {
+        return new Dog("Little white");
     }
 }
 

@@ -1234,9 +1234,21 @@ var json = JSON.stringify({a: 'Hello', b: 'World'});
 
 
 
-# 9.1 从Controller返回JSON数据
+## 9.1 从Controller返回JSON数据
 
-在控制类的方法上使用 `@ResponseBody` 注解或者在控制类上用 `@RestController` 注解替换 `@Controller` 注解，**可以跳过视图解析器，即直接向前端返回JSON字符串或者普通的字符串，而不转发或者重定向到新的页面。**
+在**控制类**的**方法**上使用 `@ResponseBody` 注解或者在**控制类**上用 `@RestController` 注解替换 `@Controller` 注解，**可以跳过视图解析器，即直接向前端（客户端）返回JSON字符串或者普通的字符串，而不转发或者重定向到新的页面（不再走视图解析器）。**
+
+使用 `@Responsebody` 之后，方法的返回值会以特定的格式写入到response的body区，进而将数据返回给客户端。
+
+* 如果返回值是字符串，直接将字符串写到客户端；如果是一个对象，会将对象转换成json串，然后写到客户端。
+
+  
+
+`@Responsebody` 可以对单个方法使用
+
+`@RestController` 只能对整个类使用，使用后所有方法都不再走视图解析器。
+
+
 
 这样后端只需编写接口向前端传数据，前后端分离的实现思想。
 
@@ -1419,7 +1431,17 @@ var json = JSON.stringify({a: 'Hello', b: 'World'});
        }
    ```
 
-   
+
+
+
+## 9.2 @JsonInclude
+
+`@JsonIncude(value = JsonInclude.Include.NON_NULL)` 注解
+**一般返回给前端的对象会存放在一个名为vo（view object）的包下**
+返回给前端的**对象序列化成Json字符串**时，如果对属性有限制要求，可以使用这个注解，比如将注解添加在类上，类中所有属性非空的时候，被序列化成Json字符串，否则不添加这个属性。默认的是 `JsonInclude.Include.ALWAYS` 将所有属性都序列化。
+**这个注解也可以单独对某个属性或方法使用**
+
+
 
 # 10. SSM整合
 

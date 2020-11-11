@@ -715,7 +715,7 @@ try (SqlSession session = sqlSessionFactory.openSession()) {
 <resultMap id="userResuleMap" type="com.maowei.pojo.User">
 	<!--<result column="id" property="id"/>-->
     <!--<result column="name" property="name"/>-->
-    <resule column="pwd" property="password"/>
+    <result column="pwd" property="password"/>
 </resultMap>
 
 <select id="getUserById" resultMap="userResuleMap">
@@ -1669,3 +1669,29 @@ Ehcache是一种广泛使用的开源Java分布式缓存。主要面向通用缓
 
 目前使用使用Redis做缓存处理。
 
+
+
+# 15. Mybatis Generator
+
+Mybatis Generator执行指令：
+
+**mvn mybatis-generator:generate**
+
+在pom文件中配置mybatis generator插件的时候，做额外的配置，每次生成Mapper.xml的时候重写原来的文件（默认是追加到原来的xml文件中）。
+
+如果要生成新的mapper接口，mapper.xml，pojo，可以每次只保留一条想要生成的表的table标签，避免重写已经生成的表。
+
+`<table tableName="mall_order_item" domainObjectName="OrderItem" enableCountByExample="false" enableDeleteByExample="false" enableSelectByExample="false" enableUpdateByExample="false"/>`
+
+```xml
+<plugin>
+    <groupId>org.mybatis.generator</groupId>
+    <artifactId>mybatis-generator-maven-plugin</artifactId>
+    <version>1.3.7</version>
+
+    <!-- 使用配置，每次运行generator的时候重写mapper.xml中的内容，而不是追加 -->
+    <configuration>
+        <overwrite>true</overwrite>
+    </configuration>
+</plugin>
+```

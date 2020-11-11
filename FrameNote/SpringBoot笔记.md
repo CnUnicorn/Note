@@ -1517,3 +1517,127 @@ C：前端和后端的交接
 * 取数据时：
 
 在从数据库中取数据的时候，数据库会先将数据库中的数据按GBK格式解码成字节码，然后再将解码后的字节码重新按UTF-8格式编码数据，最后再将数据返回给客户端。
+
+
+
+# 12. @RequestParam与@RequestBody的区别
+
+`@RequestBody` 注解：在**Content-Type为application/json**时，需要使用这个注解。在参数上加上这个注解，spring会将request body中的**json/xml对象**解析成该参数类型的**JavaBean对象或者String字符串**。（比如Post请求体中的数据解析成字符串）。
+
+如果参数是字符串，请求体中的是一个对象的json字符串，那么这个参数为直接解析成json格式的字符串；
+
+如果参数是一个对象，请求体中也是一个对象，那么直接解析成对象。
+
+![image-20201110143836938](SpringBoot笔记.assets/image-20201110143836938.png)
+
+
+
+`@RequestParam` 注解：在**Content-Type为application/x-www-urlencoded**时，需要使用这个注解。将方法中的**一个**参数和web请求中的**一个**参数绑定。一般用于从GET请求中取出对应参数的值（Post请求中也可以用，绑定请求中的参数和方法中的参数）。
+
+
+
+**总结：**
+
+使用 `@RequestParam` 还是 `@RequestBody` 与请求方式（GET、POST）无关，与请求中的Content-Type有关。
+
+* 使用 application/x-www-urlencoded，使用 `@RequestParam` 注解
+
+* 使用 application/json，使用 `@RequestBody` 注解
+
+  
+
+# 13. @NotNull,@NotEmpty,@NotBlank
+
+**注意：**三者必须是这个包内的注解：`javax.validation.constraints`
+
+
+
+**1.@NotNull(message = "某个属性不能为空")：**message为报错时的错误信息，默认错误信息是“不能为空”
+不能为null，但可以为empty(""," “,” ") ，**一般用在基本数据类型的非空校验上**，而且被其标注的字段可以使用 @size/@Max/@Min对字段数值进行大小的控制
+
+**2.@NotEmpty：**
+不能为null，而且长度必须大于0(" “,” ")，**一般用在集合类上面**
+
+**3.@NotBlank：**
+**只能作用在接收的String类型**上，注意是**只能**，不能为null，而且调用trim()后，长度必须大于0，即字符串中不能只有empty(""," “,” ") 
+
+
+
+# 14. @Valid和BindingResult
+
+这两个注解搭配上面的 `@NotBlank` 、`@NotNull`、`@NotEmpty` 注解使用，或者 `@Length`、`@Range` 等其他对参数做了限制的注解。
+
+对方法中的参数使用 `@Valid` 注解，表示对这个参数（对象属性）进行验证。使用这个注解目的是**减少在Controller中对参数的判断**。
+
+**BindingResult**直接作为Controller方法中的一个参数，**用来存放验证结果**。
+
+
+
+下面是一个例子：如果不使用注解对参数进行限制，对参数进行校验，Controller中的方法**会需要很多对参数的判断**
+
+**UserForm对象：**
+
+```java
+public class UserForm {
+    
+//    @NotEmpty // 不能为null，长度必须大于0，一般用于判断集合是否为空
+//    @NotNull  // 不能为null，但可以为empty
+    @NotBlank // 只能用于String，并且trim()后长度要大于0，即不能有空格
+    private String username;
+
+    @NotBlank
+    private String password;
+
+    @NotBlank
+    private String email;
+// 为了简介，省略了getter和setter方法
+}
+```
+
+
+
+**Controller中的方法：**
+
+UserForm用来保存前端请求中的 json 对象数据，**并对UserForm中的有注解的属性进行校验**。
+
+**BindingResult接口中的方法**：BindingResult继承Errors接口
+
+* `boolean hasErrors()`：用来判断属性检验时，有没有错误
+
+* `FieldError getFieldError()`：（Erros接口中的方法，没有覆写）取出一个出错的属性，返回一个 `FieldError` 对象，如果有多个属性校验出错，返回第一个出错的属性。
+
+* `List<FieldError> getFieldErrors()`：（Errors接口中的方法，没有覆写）取出所有出错的属性，返回一个列表
+
+
+
+**FieldError中的方法**：下面两个方法没有在FieldError覆写，是它的一个父类**DefaultMessageSourceResolvable**中的方法
+
+* `public String getField()`：取出出错的属性名称
+
+* `public String getDefaultMessage()`：用来取出对应错误属性的错误信息
+
+```java
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @PostMapping("/register")
+    public ResponseVo register(@Valid @RequestBody UserForm userForm,
+                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            logger.info("注册提交的参数有误，{} {}",
+                    bindingResult.getFieldError().getField(),
+                    bindingResult.getFieldError().getDefaultMessage());
+            return ResponseVo.error(ResponseEnum.PARAM_ERROR, bindingResult);
+        }
+        logger.info("用户名={}", userForm.getUsername());
+
+        return ResponseVo.error(ResponseEnum.NEED_LOGIN);
+    }
+}
+```
+
+
+
