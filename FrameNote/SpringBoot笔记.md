@@ -1641,3 +1641,23 @@ public class UserController {
 
 
 
+# 15. 测试类需要注意的细节
+
+测试类能够运行需要继承 **XXXApplicationTests类**，如下：
+
+![image-20201112104336341](SpringBoot笔记.assets/image-20201112104336341.png)
+
+或者在测试类上添加上注解：
+
+继承主测试类，实际上就是为了继承这两个注解，比较方便
+
+```Java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+```
+
+
+
+如果两者都没有满足要求，测试类就没办法运行，`@Autowired` 注解会报一个错误：
+
+Autowired menber must be defined in valid Spring bean(@Component|@Service...)
