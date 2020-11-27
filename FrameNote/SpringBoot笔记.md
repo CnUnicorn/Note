@@ -1522,7 +1522,7 @@ C：前端和后端的交接
 
 # 12. @RequestParam与@RequestBody的区别
 
-`@RequestBody` 注解：在**Content-Type为application/json**时，需要使用这个注解。在参数上加上这个注解，spring会将request body中的**json/xml对象**解析成该参数类型的**JavaBean对象或者String字符串**。（比如Post请求体中的数据解析成字符串）。
+`@RequestBody` 注解：**只有在请求是POST请求**，并且**Content-Type为application/json**时，需要使用这个注解。在参数上加上这个注解，spring会将request body中的**json/xml对象**解析成该参数类型的**JavaBean对象或者String字符串**。（比如Post请求体中的数据解析成字符串）。
 
 如果参数是字符串，请求体中的是一个对象的json字符串，那么这个参数为直接解析成json格式的字符串；
 
@@ -1532,19 +1532,29 @@ C：前端和后端的交接
 
 
 
-`@RequestParam` 注解：在**Content-Type为application/x-www-urlencoded**时，需要使用这个注解。将方法中的**一个**参数和web请求中的**一个**参数绑定。一般用于从GET请求中取出对应参数的值（Post请求中也可以用，绑定请求中的参数和方法中的参数）。
+`@RequestParam(value = "name", required = false, defaultValue = "10")` 注解：
+
+参数 `required` 默认是true，value是url中的参数名
+
+* 在请求是**GET请求**时，只能使用 `@RequestParam` 注解获取GET
+
+请求中携带的参数信息；
+
+* 或者在请求是**POST请求**时，且**Content-Type为application/x-www-urlencoded**时，需要使用这个注解。将方法中的**一个**参数和web请求中的**一个**参数绑定。一般用于从GET请求中取出对应参数的值（Post请求中也可以用，绑定请求中的参数和方法中的参数）。
 
 
 
 **总结：**
 
-使用 `@RequestParam` 还是 `@RequestBody` 与请求方式（GET、POST）无关，与请求中的Content-Type有关。
+使用 `@RequestParam` 还是 `@RequestBody` 与请求方式（GET、POST）和请求中的Content-Type有关。
 
-* 使用 application/x-www-urlencoded，使用 `@RequestParam` 注解
+* 使用 `@RequestParam` 注解的情况
+  * 请求为GET请求
+  * 请求为POST请求，且**Content-Type**为 application/x-www-urlencoded 
+* 使用 `@RequestBody` 注解的情况
+  * 请求为**POST请求**，且**Content-Type**为 application/json
 
-* 使用 application/json，使用 `@RequestBody` 注解
 
-  
 
 # 13. @NotNull,@NotEmpty,@NotBlank
 

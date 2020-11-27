@@ -1437,7 +1437,8 @@ var json = JSON.stringify({a: 'Hello', b: 'World'});
 ## 9.2 @JsonInclude
 
 `@JsonIncude(value = JsonInclude.Include.NON_NULL)` 注解
-**一般返回给前端的对象会存放在一个名为vo（view object）的包下**
+**一般返回给前端的对象会存放在一个名为vo（view object）的包下**，vo对象的属性根据前端的要求来指定，前端需要什么字段就设置这些字段返回给前端。
+
 返回给前端的**对象序列化成Json字符串**时，如果对属性有限制要求，可以使用这个注解，比如将注解添加在类上，类中所有属性非空的时候，被序列化成Json字符串，否则不添加这个属性。默认的是 `JsonInclude.Include.ALWAYS` 将所有属性都序列化。
 **这个注解也可以单独对某个属性或方法使用**
 

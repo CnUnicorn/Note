@@ -999,7 +999,7 @@ int deleteUser(@Param("uid") int id);
 **关于@Param( )注解：**
 
 * 当方法参数是基本数据类型或者是String类型时，**每个参数前都要加上@Param( )注解**
-* 当参数时引用类型时，不用加注解
+* 当参数是引用类型时，不用加注解
 * 如果只有一个基本数据类型时，可以不加，但是建议加上
 * 在sql中#{uid}中引用的就是@Param("uid")中设定的属性名，而不是形参名
 
@@ -1467,9 +1467,9 @@ SELECT * from blog where and author = #{}author
 
 动态 SQL 的另一个常见使用场景是**对集合进行遍历（尤其是在构建 IN 条件语句的时候）**。
 
-foreach允许指定一个集合，声明可以在元素体内使用的**集合项（item）**和索引（index）变量。它也允许你指定**开头与结尾的字符串以及集合项迭代之间的分隔符**。
+foreach允许指定一个集合，声明可以在元素体内使用的**集合项（item）**和**索引（index）**变量。它也允许你指定**开头与结尾的字符串以及集合项迭代之间的分隔符**。
 
-实际上foreach是遍历集合中的元素，并将他们拼接成SQL语句。
+**实际上foreach是遍历集合中的元素，并将他们拼接成SQL语句。**
 
 比如：查询特定几个id的blog（**传入一个集合**）。
 
@@ -1704,3 +1704,16 @@ Mybatis查询结果映射到实体类时，Mybatis通过反射动态生成实体
 如果类中没有显式定义其他构造函数，虚拟机会自动提供默认构造方法（无参构造器），如果显式定义了其他有参数的构造方法，虚拟机就不再为其提供默认的构造方法。
 
 所以Mybatis查询结果映射到实体类时，如果有其他带有参数的构造方法，就必须显式地定义一个无参的构造方法，否则Mybatis通过反射生成实例的时候会抛出异常。
+
+
+
+# 17. insert方法中返回自增的Id
+
+有的时候需要拿到插入对象的自增主键Id，这个时候需要在Mapper.xml文件中配置，这样就不需要再重新去数据库中查询一次了
+如：
+* Mapper接口中的方法:
+	`int insertSelective(Shipping record);`
+* Mapper.xml文件中的配置：
+	`<insert id="insertSelective" parameterType="com.maowei.mall.pojo.Shipping" useGeneratedKeys="true" keyProperty="id">`
+	配置useGeneratedKeys参数和**keyProperty**参数，在插入操作完成后，将数据库中的keyProperty设置的字段值，设置到传入的对象中，即接口方法传入的参数中,上面的操作就是把自增的id设置到传入的Shipping对象中.
+

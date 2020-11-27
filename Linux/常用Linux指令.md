@@ -60,6 +60,7 @@ ls      #查看目录中的文件
 ls -F   #查看目录中的文件
 ls -l   #显示文件和目录的详细资料
 ls -a   #显示隐藏文件
+ls -h   #显式文件大小，单位转换为k，通常用 ls -alh来显示所有文件的详细信息
 ls *[0-9]*   #显示包含数字的文件名和目录名
 tree         #显示文件和目录由根目录开始的树形结构(1)
 lstree       #显示文件和目录由根目录开始的树形结构(2)
@@ -225,11 +226,13 @@ tar -cvf archive.tar file1   #创建一个非压缩的 tarball
 tar -cvf archive.tar file1 file2 dir1  #创建一个包含了 'file1', 'file2' 以及 'dir1'的档案文件
 tar -tf archive.tar    #显示一个包中的内容
 tar -xvf archive.tar   #释放一个包
-tar -xvf archive.tar -C /tmp     #将压缩包释放到 /tmp目录下
-tar -cvfj archive.tar.bz2 dir1   #创建一个bzip2格式的压缩包
-tar -jxvf archive.tar.bz2        #解压一个bzip2格式的压缩包
-tar -cvfz archive.tar.gz dir1    #创建一个gzip格式的压缩包
-tar -zxvf archive.tar.gz         #解压一个gzip格式的压缩包
+tar -xvf archive.tar -C /tmp       #将压缩包释放到 /tmp目录下
+tar -cvfj archive.tar.bz2 dir1     #创建一个bzip2格式的压缩包
+tar -jxvf archive.tar.bz2          #解压一个bzip2格式的压缩包
+tar -cvfz archive.tar.gz dir1      #创建一个gzip格式的压缩包
+
+tar -zcvf archive.tar.gz test.txt  #压缩文件,tar -zcvf 压缩后的文件名 目标文件名
+tar -zxvf archive.tar.gz           #解压一个gzip格式的压缩包
 
 zip file1.zip file1    #创建一个zip格式的压缩包
 zip -r file1.zip file1 file2 dir1    #将几个文件和目录同时压缩成一个zip格式的压缩包
@@ -276,6 +279,8 @@ rpmbuild --rebuild package_name.src.rpm       #从一个rpm源码构建一个 rp
 ```
 yum install package_name             #下载并安装一个rpm包
 yum localinstall package_name.rpm    #将安装一个rpm包，使用你自己的软件仓库为你解决所有依赖关系
+yum update                     #升级所有包的同时也升级软件和系统内核
+yum upgrade                    #只升级所有包，不升级软件和系统内核
 yum update package_name.rpm    #更新当前系统中所有安装的rpm包
 yum update package_name        #更新一个rpm包
 yum remove package_name        #删除一个rpm包
@@ -514,5 +519,48 @@ mii-tool                #用于查看、管理介质的网络接口的状态
 ethtool                 #用于查询和设置网卡配置
 netstat -tupl           #用于显示TCP/UDP的状态信息
 tcpdump tcp port 80     #显示所有http协议的流量
+```
+
+
+
+# 25. 创建文件
+
+1. 创建一个文件
+
+   ```
+   touch test.txt
+   ```
+
+2. 创建两个文件
+
+   ```
+   touch test1.txt test2.txt
+   ```
+
+3. 创建批量文件（如创建2000个文件）
+
+   ```
+   touch test{0001..2000}.txt
+   ```
+
+
+
+
+# 26. 查看占用CPU和内存最高的进程
+
+1. 查看使用内存最多的10个进程
+
+   `ps -aux | sort -k4nr | head -n 10`
+
+2. 查看使用CPU最多的10个进程
+
+   `ps -aux | sort -k3nr | head -n 10`
+
+
+
+# 27. kill某个用户的所有进程
+
+```
+pkill -u user
 ```
 
