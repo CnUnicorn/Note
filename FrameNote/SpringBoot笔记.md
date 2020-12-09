@@ -1671,3 +1671,12 @@ public class UserController {
 如果两者都没有满足要求，测试类就没办法运行，`@Autowired` 注解会报一个错误：
 
 Autowired menber must be defined in valid Spring bean(@Component|@Service...)
+
+
+
+# 16. 日志添加到文件
+
+```yaml
+logging:
+  path: /root/logs/mall
+```

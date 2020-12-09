@@ -1488,7 +1488,7 @@ List<Blog> queryBlogForEach(Map map);
 <select id="queryBlogForEach" parameterType="map" resultType="Blog">
     select * from blog
     <where>
-        <foreach collection="ids" item="id" open="and (" close=")" separator="OR">
+        <foreach collection="ids" item="id" open="(" close=")" separator="OR">
             id=#{id}
         </foreach>
     </where>
