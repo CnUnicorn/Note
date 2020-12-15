@@ -53,9 +53,9 @@ class Solution {
        public int movingCount(int m, int n, int k) {
            if (k == 0) return 1; // 当k=0时，只有（0，0）可以到达
    
-           Queue<int[]> queue = new LinkedList<>(); // 存储可以访问到的点的坐标
+           Queue<int[]> queue = new LinkedList<>(); // 存储可以访问到的点的坐标，BFS
            queue.add(new int[]{0, 0});
-           boolean[][] visit = new boolean[m][n]; // 用来标记已经统计过的格子
+           boolean[][] visit = new boolean[m][n]; // 用来标记已经踏入过的格子
            visit[0][0] = true; // 已经将初始（0，0）添加到队列中了，标记为已经过
            int res = 1; // 已经将初始点添加到队列中，统计数初始化为1
    
@@ -68,9 +68,9 @@ class Solution {
                    int tx = dx[i] + x;
                    int ty = dy[i] + y;
                    if (tx < 0 || tx >= m || ty < 0 || ty >= n || visit[tx][ty] || sumOfNum(tx, ty) > k) {
-                       continue; // 越界或者坐标点位数和大于k,或者这个点已经访问过
+                       continue; // 越界,或者这个点已经访问过，或者坐标点位数和大于k
                    }
-                   visit[tx][ty] = true;
+                   visit[tx][ty] = true; // 踏入坐标点，标记为true
                    res++; // 如果没越界且满足小于k的要求，可达数量+1
                    queue.add(new int[]{tx, ty}); // 并将可达点添加到队列中，继续BFS
                }
