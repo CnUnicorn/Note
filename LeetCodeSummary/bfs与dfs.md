@@ -30,7 +30,7 @@ class Solution {
         board[i][j] = '\0'; // 把经过的点标记成空格，保证不会重新去遍历经过的点
         boolean res = dfs(board, word, i - 1, j, k + 1) || dfs(board, word, i + 1, j, k + 1) || 
                       dfs(board, word, i, j - 1, k + 1) || dfs(board, word, i, j + 1, k + 1);
-        board[i][j] = word[k]; // dfs结束后，将空格还原成原来的值，只针对单个起点的修改
+        board[i][j] = word[k]; // dfs结束后，将空格还原成原来的值，只针对单个起点的修改，回溯
         return res;
     }
 }
@@ -63,7 +63,7 @@ class Solution {
            while (!queue.isEmpty()) {
                int[] tmp = queue.poll();
                int x = tmp[0], y = tmp[1];
-               // 广度优先遍历，遍历相邻右边和相邻下变的坐标点
+               // 广度优先遍历，遍历相邻右边和相邻下边的坐标点
                for (int i = 0;i < 2;i++) {
                    int tx = dx[i] + x;
                    int ty = dy[i] + y;
