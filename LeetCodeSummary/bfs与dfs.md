@@ -133,3 +133,74 @@ class Solution {
    ```
 
    上面两种方法的时间复杂度都是O(mn)，都是遍历所有的坐标点。
+
+
+
+# 剑指offer 38. 字符串的排列
+
+排列方案的总数量有：$n \times (n-1) \times (n - 2) ··· \times 2 \times 1$
+
+比较直观的排列方案可以用树状图表示（图源题解）。
+
+<img src="https://pic.leetcode-cn.com/dc4659dbda6d54f50a8c897647fb7c52e2b8200e741c4d6e25306dfe51f93bb6-Picture1.png" alt="Picture1.png" style="zoom:67%;" />
+
+**排列方案的生成方法：**考虑深度优先搜索的所有排列方案。通过字符交换，先固定第1位字符（n种交换情况），再固定第2位字符（n - 1种交换情况），··· ，第n位字符（1种交换情况）。
+
+* 交换的时候将第x位字符和下标$i \in [x, c.length - 1]$的字符进行交换。第x位与第x位交换的原因是，记录第x位的字符，在后面出现重复字符的时候，不再进行交换。
+* 重复方案的解决方法：保证“重复字符在当前位置只固定一次”，即出现重复字符时不再进行交换（剪枝）。
+
+
+
+**递归逻辑：**
+
+* 递归参数x：固定第x位字符
+
+* 递归终止条件：如果要固定的位置已经是最后一位了（只有一种交换的情况），将构成的字符串添加到结果列表里
+* 初始化一个set，用来记录从第x位开始，已经出现过的字符。
+* 循环，将第x位字符，与下标$i \in [x, c.length - 1]$的字符进行交换。
+  * 如果要交换的第i位字符已经出现过了，那么不再交换（重复字符只固定一次）。
+  * 将出现过的字符（第i位字符），添加到set中。
+  * 交换第i位和第x位字符
+  * 递归固定第x+1位的字符
+  * 换回第i位和第x位字符（回溯），保证不影响其他情况
+
+```java
+class Solution {
+    
+    private List<String> res = new ArrayList<>();
+    private char[] c;
+
+    public String[] permutation(String s) {
+        c = s.toCharArray();
+        dfs(0);
+        return res.toArray(new String[res.size()]);
+    }
+
+    void dfs(int x) { // 固定第x位字符
+        if (x == c.length - 1) { // 如果要固定的字符已经是最后一位了，直接将构成的字符串添加到结果列表中
+            res.add(new String(c));
+            return;
+        }
+
+        Set<Character> set = new HashSet<>(); // 用来存储已经出现过的字符(剪枝)
+        for (int i = x;i < c.length;i++) { // 将第x位的字符，与下标[x,c.length - 1]的字符交换
+            // 从第x位开始交换的原因是，要把第x位的字符也添加到set中，出现重复字符的话就不交换
+            if (set.contains(c[i])) {
+                continue;
+            }
+            
+            set.add(c[i]); // 将出现过的字符加入到set中
+            swap(i, x);
+            dfs(x + 1);
+            swap(i, x);    // 将第i和第x位字符重新换回来,下一个循环交换第i+1位和第x位字符，回溯
+        }
+    }
+
+    void swap(int i, int x) {
+        char tmp = c[i];
+        c[i] = c[x];
+        c[x] = tmp;
+    }
+}
+```
+

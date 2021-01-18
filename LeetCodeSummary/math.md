@@ -86,3 +86,36 @@ class Solution {
 }
 ```
 
+
+
+# 剑指offer 44. 数字序列中的某一位数字
+
+找规律，具体分析过程看题解。
+
+大致思路是：
+
+* 先找到第n位数字所在的范围
+* 再找到第n位具体是哪个数字
+* 再找第n位是数字中的哪一位
+
+```java
+class Solution {
+    public int findNthDigit(int n) {
+        if (n == 0) return 0;
+        int digit = 1;             // 第n位所在范围的位数。1位，2位，3位等等 
+        long start = 1, count = 9; // start是范围开始的数，count是范围内所有的数字位数的数量
+                                   // start和digit会超出int范围，所以用long
+        while (n > count) {
+            n -= count;            // 递推关系
+            start *= 10;           // start = start * 10
+            digit += 1;            // digit = digit + 1
+            count = 9 * start * digit; // count = 9 * start * digit
+        }
+
+        long num = start + (n - 1) / digit; // 找到具体是哪一个数字
+        char c = Long.toString(num).charAt((n - 1) % digit); // 再找是数字中的哪一位
+        return c - '0';
+    }
+}
+```
+
