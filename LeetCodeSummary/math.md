@@ -305,3 +305,56 @@ class Solution {
 }
 ```
 
+
+
+# 剑指offer 62. 圆圈中最后剩下的数字
+
+暂时还没看明白题解
+
+https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-by-lee/
+
+```java
+class Solution {
+    public int lastRemaining(int n, int m) {
+        int f = 0;
+        for (int i = 2; i != n + 1; ++i) {
+            f = (m + f) % i;
+        }
+        return f;
+    }
+}
+```
+
+
+
+# 剑指offer 43. 1~n整数中1出现的次数
+
+https://leetcode-cn.com/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/solution/mian-shi-ti-43-1n-zheng-shu-zhong-1-chu-xian-de-2/
+
+具体的三种情况的推导可以看题解，图中的“易得”，可以对标到生活中的滚轮密码锁，固定其中一位，转动其他位，这样好理解一点，**因为1可以出现的数字范围，最后cur都固定到1**。
+
+三种情况：
+
+1. cur == 0，当前位1出现的次数只由 high（高位）决定，high $\times$ digit，digit为当前位的数量级
+2. cur == 1，当前位1出现的次数 = high $\times$ digit + low + 1
+3. cur == 2,3,····,9，当前位1出现的次数 = （high + 1） $\times$ digit
+
+```java
+class Solution {
+    public int countDigitOne(int n) {
+        int high = n / 10, cur = n % 10, low = 0;
+        int res = 0, digit = 1;
+        while(high != 0 || cur != 0) { // 判断条件使用两个或，是为了把最高位也加进去，如果只有high!=0一个条件，那么最高位的计算就会被忽略
+            if (cur == 0) res += high * digit;
+            else if (cur == 1) res += high * digit + low + 1;
+            else res += (high + 1) * digit;
+            low += digit * cur;
+            cur = high % 10;
+            high /= 10;
+            digit *= 10;
+        }
+        return res;
+    }
+}
+```
+

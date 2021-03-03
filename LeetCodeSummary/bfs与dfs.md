@@ -134,6 +134,42 @@ class Solution {
 
    上面两种方法的时间复杂度都是O(mn)，都是遍历所有的坐标点。
 
+# Hot100-46. 全排列
+
+这道题是剑指Offer 38. 字符串的排列的简化版，题目给出了所有数字不重复的情况，字符串的排列中有字符重复的情况，需要另外通过剪枝实现非重复字符串的查找。
+
+```java
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        helper(res, nums, 0);
+        return res;
+    }
+
+    public void helper(List<List<Integer>> res, int[] nums, int idx) {
+        if (idx == nums.length - 1) {
+            List<Integer> tmp = new ArrayList<>();
+            for (int n : nums) {
+                tmp.add(n);
+            }
+            res.add(tmp);
+        }
+
+        for (int i = idx;i < nums.length;i++) { // 固定一位
+            swap(nums, i, idx);         // 将第idx位，和自己及后面的所有位交换，来实现这一位的固定
+            helper(res, nums, idx + 1); // 递归固定下一位
+            swap(nums, i, idx);
+        }
+    }
+
+    public void swap(int[] nums, int i, int j) {
+        int tmp = nums[j];
+        nums[j] = nums[i];
+        nums[i] = tmp;
+    }
+}
+```
+
 
 
 # 剑指offer 38. 字符串的排列
@@ -176,16 +212,17 @@ class Solution {
         return res.toArray(new String[res.size()]);
     }
 
-    void dfs(int x) { // 固定第x位字符
+    public void dfs(int x) { // 固定第x位字符
         if (x == c.length - 1) { // 如果要固定的字符已经是最后一位了，直接将构成的字符串添加到结果列表中
             res.add(new String(c));
             return;
         }
-
-        Set<Character> set = new HashSet<>(); // 用来存储已经出现过的字符(剪枝)
+		
+        // 注意这个set是，当前这一位递归的临时set
+        Set<Character> set = new HashSet<>(); // 用来当前位存储已经出现过的字符(剪枝)
         for (int i = x;i < c.length;i++) { // 将第x位的字符，与下标[x,c.length - 1]的字符交换
-            // 从第x位开始交换的原因是，要把第x位的字符也添加到set中，出现重复字符的话就不交换
-            if (set.contains(c[i])) {
+            // 从第x位开始交换的原因是，要把第x位的字符也添加到set中，出现重复字符的话就不交换，以及x本身也是一种排列
+            if (set.contains(c[i])) { // 如果这一位已经排列过这个字符，就不再重复排列
                 continue;
             }
             
@@ -200,6 +237,163 @@ class Solution {
         char tmp = c[i];
         c[i] = c[x];
         c[x] = tmp;
+    }
+}
+```
+
+
+
+# Hot100-17. 电话号码的字母组合
+
+理论上就是遍历所有组合，digits有几位，就有几个for循环，但是for循环是写死的，没有办法适应digits长度的变化。
+
+实际上还是使用dfs，加上回溯的方法，index表示digits和最后组合出来的字符串的下标。
+
+将每个数字对应的字符串全部存储到map里，每一次递归都选择一个字符，然后递归下一位，每一轮递归结束后（即每一位数字都遍历完了），回溯删除当前位的字符，重新选择下一个字符。
+
+```java
+class Solution {
+    public List<String> letterCombinations(String digits) {
+        if(digits.length() == 0) return new ArrayList<>();
+        List<String> res = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        Map<Character, String> map = new HashMap<>();
+        map.put('2', "abc");
+        map.put('3', "def");
+        map.put('4', "ghi");
+        map.put('5', "jkl");
+        map.put('6', "mno");
+        map.put('7', "pqrs");
+        map.put('8', "tuv");
+        map.put('9', "wxyz");
+        helper(res, digits, map, 0, stringBuilder);
+        return res;
+    }
+
+    public void helper(List<String> res, String digits, Map<Character, String> map, int index, StringBuilder combination) { // index表示，遍历到digits中当前所在的字符下标
+        if (index == digits.length()) {
+            res.add(combination.toString());
+            return;
+        }
+        
+        String chars = map.get(digits.charAt(index)); // 取出对应数字可能匹配的字符
+        for (int i = 0;i < chars.length();i++) { // 遍历所有对应的字符
+            combination.append(chars.charAt(i));
+            helper(res, digits, map, index + 1, combination);
+            combination.deleteCharAt(index); // 回溯删除当前字符，加入下一个字符
+        }
+    }
+}
+```
+
+
+
+# Hot100-22. 括号生成
+
+逻辑：保证括号匹配
+
+* 左括号剩余的数量 >= 右括号时，只能添加左括号
+* 左括号剩余的数量 <   右括号时，可以添加左括号，也可以添加右括号
+
+**主要是注意递归的写法：**如何把上面两种情况全部考虑进去
+
+```java
+class Solution {
+    public List<String> generateParenthesis(int n) {
+        List<String> res = new ArrayList<>();
+        StringBuilder combination = new StringBuilder();
+        int remainLeft = n, remainRight = n;
+        helper(res, remainLeft, remainRight, combination);
+        return res;
+    }
+
+    public void helper(List<String> res, int remainLeft, int remainRight, StringBuilder combination) {
+        // 逻辑：保证括号匹配
+        // 左括号剩余的数量 >= 右括号时，只能添加左括号
+        // 左括号剩余的数量 < 右括号时，可以添加右括号，也可以添加左括号
+        if (remainLeft == 0 && remainRight == 0) {
+            res.add(combination.toString());
+            return;
+        }
+        if (remainLeft >= 0) { // 两种情况左括号都可以添加，所以先添加左括号，递归结束后，回溯删除组合中的当前字符
+            combination.append('(');
+            helper(res, remainLeft - 1, remainRight, combination);
+            combination.deleteCharAt(combination.length() - 1);
+        } 
+        // 因为右括号剩余数量必定大于左括号，并且上面已经判断了左括号剩余数量大于0，所以无需判断右括号数量大于0了
+        if (remainLeft < remainRight) { // 然后再判断当前情况下能不能添加右括号，这样操作才可以把上面的两种情况都考虑到
+            combination.append(')');
+            helper(res, remainLeft, remainRight - 1, combination);
+            combination.deleteCharAt(combination.length() - 1);
+        }
+    }
+}
+```
+
+
+
+# Hot100-39 组合总和
+
+一般这种排列的题目，都是用回溯遍历所有的可能性。
+
+下面是最简单的回溯方法。采用适当的剪枝操作，能够减少搜索的次数。
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        Deque<Integer> tmp = new LinkedList<>();
+        helper(res, tmp, target, candidates, 0);
+        return res;
+    }
+
+    public void helper(List<List<Integer>> res, Deque<Integer> tmp, int target, int[] candidates, int begin) {
+        if (target < 0) { // 当减掉的数太大时，不是正确的组合，直接回溯
+            return;
+        }
+        if (target == 0) {
+            res.add(new ArrayList<>(tmp));
+            return;
+        }
+
+        for (int i = begin;i < candidates.length;i++) {
+            tmp.addLast(candidates[i]);
+            helper(res, tmp, target - candidates[i], candidates, i); // 这里由于每个元素都可以重复使用，所以，下一个数值的选取从当前位置开始。如果当前数字不可重复使用，那么直接从下一位开始搜索
+            // 如果下一个坐标从0（而不是从i）开始记，会出现组合重复的情况。（即前面使用过的数字，不要再重复使用了，除了当前数字重复使用的情况）
+            tmp.pollLast();
+        }
+    }
+}
+```
+
+
+
+简单的剪枝：
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        Deque<Integer> tmp = new LinkedList<>();
+        Arrays.sort(candidates); // 剪枝的前提
+        helper(res, tmp, target, candidates, 0);
+        return res;
+    }
+
+    public void helper(List<List<Integer>> res, Deque<Integer> tmp, int target, int[] candidates, int begin) {
+        if (target == 0) {
+            res.add(new ArrayList<>(tmp));
+            return;
+        }
+
+        for (int i = begin;i < candidates.length;i++) {
+            if (target < candidates[i]) { // 如果这个数值已经大于target，且数组又排好序了，那么无论后面怎么取，必定都是大于target的，剪枝（前提是数组排好序）
+                break;
+            }
+            tmp.addLast(candidates[i]);
+            helper(res, tmp, target - candidates[i], candidates, i); // 这里由于每个元素都可以重复使用，所以，下一个数值的选取从当前位置开始
+            tmp.pollLast();
+        }
     }
 }
 ```
