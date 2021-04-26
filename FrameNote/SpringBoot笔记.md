@@ -533,7 +533,7 @@ yaml注入配置文件：
 ## 4.6 yaml配置文件占位符
 
 ```yaml
-erson:
+person:
     name: maowei${random.uuid} # 随机uuid
     age: ${random.int}  # 随机int
     happy: false
@@ -548,6 +548,16 @@ erson:
       name: ${person.hello:other}_旺财 # 如果person有hello属性，使用hello属性替换；否则使用other替换进行拼接
       age: 1
 ```
+
+```yaml
+spring:
+  application:
+    name: ${APPLICATION_NAME:SCC}--${SERVICE_NAME:scc-auth}
+    # 在bootstrap.yml中配置该模块在服务中心的服务名
+    # 由于在当前yml配置文件中没有APPLICATION_NAME和SERVICE_NAME属性，所以服务名为SCC--scc-auth
+```
+
+
 
 
 
