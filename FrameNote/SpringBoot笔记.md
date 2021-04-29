@@ -761,7 +761,7 @@ java -jar spring-boot-config.jar --spring.config.location=F:/application.propert
 
 * 自动配置类的名称是：xxxxxAutoConfiguration，功能是给容器中添加组件
 
-  **自动配置类总结** ：**根据当前不同的条件判断，决定这个配置类是否生效！**
+  **自动配置类总结** ：**根据项目是否满足当前的条件判断（条件在xxxxxAutoConfiguration类的@Conditional注解中），决定这个配置类是否生效！**
 
   - 一但这个配置类生效，这个配置类就会给容器中添加各种组件；
   - 这些组件的属性是从对应的properties类中获取的，这些类里面的每一个属性又是和配置文件绑定的（如果yml配置文件中没有显式地指定值，使用默认的属性）；
