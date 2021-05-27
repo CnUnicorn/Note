@@ -32,3 +32,11 @@ git pull origin dev        # 拉去远程分支
 git clone -b 分支名 url（git地址）
 ```
 
+
+
+# 本地分支关联远程分支
+
+```
+git branch --set-upstream-to=origin/远程分支名称  本地分支名称
+```
+
