@@ -353,7 +353,165 @@ HTTP状态码由三个十进制数字组成，第一个十进制数字定义了�
 
 
 
+## 5. HTTPS加密流程
+
+**HTTP和HTTPS的区别：**
+
+1. HTTP 是超文本传输协议，信息是明文传输，存在安全风险的问题。HTTPS 则解决 HTTP 不安全的缺陷，在 TCP 和 HTTP 网络层之间加入了 SSL/TLS 安全协议，使得报文能够加密传输。
+2. HTTP 连接建立相对简单， TCP 三次握手之后便可进行 HTTP 的报文传输。而 HTTPS 在 TCP 三次握手之后，还需进行 SSL/TLS 的握手过程，才可进入加密报文传输。
+3. HTTP 的端口号是 80，HTTPS 的端口号是 443。
+4. HTTPS 协议需要向 CA（证书权威机构）申请数字证书，来保证服务器的身份是可信的。
 
 
 
+**HTTPS解决了HTTP的哪些问题：**
+
+* 窃听风险，比如通信链路上可以获取通信内容，用户号容易没。
+* 篡改风险，比如强制入垃圾广告，视觉污染，用户眼容易瞎。
+* 冒充风险，比如冒充淘宝网站，用户钱容易没。
+
+
+
+HTTPS在HTTP与TCP层之间加入了SSL/TLS协议。
+
+![img](https://pic3.zhimg.com/80/v2-11869f14c2fcea7116a9bbb50f764096_1440w.jpg)
+
+
+
+**HTTPS如何解决上述的风险：**
+
+* 信息加密：**通过混合加密的方式实现信息的机密性**，解决窃听风险。
+* 校验机制：**通过摘要算法（sha1或sha256）来实现完整性**，使用摘要算法计算数字证书的内容，得到hash值（指纹），用于校验数据的完整性。
+* 身份证书：**将服务器公钥（用来加密pre-master数的公钥，pre-master用于后续会话密钥的生成）放入数字证书中**，解决了冒充的风险。
+
+
+
+**HTTPS采用的是对称加密和非对称加密结合的混合加密方式：**
+
+* 在**通信建立前采用非对称加密的方式交换会话密钥**，后续就不再使用非对称加密。
+* 在**通信过程中全部使用对称加密的会话密钥的方式加密明文数据**
+
+
+
+HTTPS在TCP连接建立后分为两个阶段：
+
+* 数字证书验证阶段
+* 信息传输过程
+
+
+
+**SSL/TLS建立的详细流程**
+
+**1. ClientHello**
+首先，由客户端向服务器发起加密通信请求，也就是 ClientHello 请求。
+在这一步，客户端主要向服务器发送以下信息：
+（1）客户端支持的 SSL/TLS 协议版本，如 TLS 1.2 版本。
+（2）客户端生产的随机数（Client Random），后面用于生产「会话秘钥」。
+（3）客户端支持的密码套件列表，如 RSA 加密算法。
+
+**2. SeverHello**
+服务器收到客户端请求后，向客户端发出响应，也就是 SeverHello。服务器回应的内容有如下内容：
+（1）确认 SSL/ TLS 协议版本，如果浏览器不支持，则关闭加密通信。
+（2）服务器生产的随机数（Server Random），后面用于生产「会话秘钥」。
+（3）确认的密码套件列表，如 RSA 加密算法。
+（4）服务器的数字证书。
+
+
+
+**3.客户端回应**
+客户端收到服务器的回应之后，首先通过浏览器或者操作系统中的 CA 公钥，确认服务器的数字证书的真实性。
+如果证书没有问题，客户端会**从数字证书中取出服务器的公钥**，然后使用它加密报文，向服务器发送如下信息：
+（1）一个随机数（pre-master key）。该随机数会被服务器公钥加密。
+（2）加密通信算法改变通知，表示随后的信息都将用「会话秘钥」加密通信。
+（3）客户端握手结束通知，表示客户端的握手阶段已经结束。这一项同时把之前所有内容的发生的数据做个摘要，用来供服务端校验。
+上面第一项的随机数是整个握手阶段的第三个随机数，这样服务器和客户端就同时有三个随机数，接着就用双方协商的加密算法，各自生成本次通信的「会话秘钥」。
+
+
+
+**4. 服务器的最后回应**
+服务器收到客户端的第三个随机数（pre-master key）之后，通过协商的加密算法，计算出本次通信的「会话秘钥」。然后，向客户端发生最后的信息：
+（1）加密通信算法改变通知，表示随后的信息都将用「会话秘钥」加密通信。
+（2）服务器握手结束通知，表示服务器的握手阶段已经结束。这一项同时把之前所有内容的发生的数据做个摘要，用来供客户端校验。
+至此，整个 SSL/TLS 的握手阶段全部结束。接下来，客户端与服务器进入加密通信，就完全是使用普通的 HTTP 协议，只不过用「会话秘钥」加密内容。
+
+
+
+整个HTTPS流程图解：
+
+![preview](https://pic1.zhimg.com/v2-29cf8cbd6cde84a8b5ee7ae92f547380_r.jpg)
+
+
+
+
+
+**补充：**
+
+**前置知识：**客户端的浏览器中内置了很多全球权威的CA机构证书的公钥（也称作根公钥），这些证书都是机构自己对自己颁发的，保证数字证书私钥的保密性。
+
+
+
+几个概念：
+
+* **指纹：**CA对证书内容用指纹算法（sha1或sha256），计算得到的**hash值**
+* **签名：**是信息后的**一串数字**。在数字证书验证中，签名是**使用根私钥对hash值和hash函数进行加密后的数字**。
+
+数字证书验证的过程中，服务器向CA机构申请数字证书，**数字证书中携带的信息是对后续pre-master（对称密钥）加密使用的公钥**。服务器使用Hash函数对数字证书的内容（data）进行计算，得到Hash值，使用CA证书的私钥对Hash值和Hash函数进行加密，得到数字签名。
+
+客户端接收到数字证书后，使用浏览器内置的公钥对签名进行解密，得到hash值和hash函数，使用解密得到的hash函数对接受到的数字证书的内容进行hash，比较解密得到的hash和计算得到的hash是否相同，如果相同，说明是受信任的证书。
+
+流程见下图：
+
+![img](https://camo.githubusercontent.com/f4df5d88f1f914fc81325b00151cefea3994c36827fd18c2a1a5e9f7582e4746/68747470733a2f2f63732d6e6f7465732d313235363130393739362e636f732e61702d6775616e677a686f752e6d7971636c6f75642e636f6d2f323031372d30362d31312d63612e706e67)
+
+和上图配套的整个HTTPS流程图如下：
+
+**注意点：**
+
+下图中省略了数字证书验证的过程，图中的**private key**和**public key**是对pre-master进行非对称加密的公私钥(公钥存放在数字证书中），也可以认为是对**会话密钥（session key）**进行加密的公私钥。
+
+![img](https://camo.githubusercontent.com/34cc60de23ad2228d3877e97ed1605fa9b858dda8610de5e3201144e3b35983a/68747470733a2f2f63732d6e6f7465732d313235363130393739362e636f732e61702d6775616e677a686f752e6d7971636c6f75642e636f6d2f486f772d48545450532d576f726b732e706e67)
+
+
+
+Java中使用X509Manager类来实现对私有数字证书或者自己想要的数字证书的加密：
+
+checkClientTrusted 和 checkServerTrusted 方法如果为空，那么绕过数字证书的验证，没有数字证书和任意证书都可以通过验证。
+
+
+
+如果不使用X509TrustManage子类，那么就会调用jvm底层的security manager来查看证书公钥（和浏览器内置的证书一样），如果发起的这个https请求对应的网站服务器没有相应的证书，那么jvm会抛出错误。
+
+```java
+private static void sslClient(HttpClient httpClient) {
+        try {
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            X509TrustManager tm = new X509TrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] xcs, String str) {
+
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] xcs, String str) {
+
+                }
+            };
+            ctx.init(null, new TrustManager[]{tm}, null);
+            SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+            ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager ccm = httpClient.getConnectionManager();
+            SchemeRegistry registry = ccm.getSchemeRegistry();
+            registry.register(new Scheme("https", 443, ssf));
+        } catch (KeyManagementException ex) {
+            throw new RuntimeException(ex);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+```
 
