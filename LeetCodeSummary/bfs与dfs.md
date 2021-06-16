@@ -12,10 +12,16 @@
 
 https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/
 
+
+
+dfs + 回溯，将走过的路径标记为空，递归后再把走过的路径赋回原值
+
+
+
 ```java
 class Solution {
     public boolean exist(char[][] board, String word) {
-        char[] words = word.toCharArray();
+        char[] words = word.toCharArray(); // 转换成数组，取值更快
         for (int i = 0;i < board.length;i++) {
             for (int j = 0;j < board[0].length;j++) {
                 if (dfs(board, words, i, j, 0)) return true; // 以坐标i，j为起点，是否存在可能的路径
@@ -25,7 +31,7 @@ class Solution {
     }
 
     public boolean dfs(char[][] board, char[] word, int i, int j, int k) {
-        if (i < 0 || i >= board.length || j < 0 || j >= board[0].length || board[i][j] != word[k]) return false; // 排除越界、不匹配和返回原路径的情况 
+        if (i < 0 || i >= board.length || j < 0 || j >= board[0].length || board[i][j] != word[k]) return false; // 排除越界、不匹配和返回原路径的情况，由于原路径标记为空，所以也是不相等 
         if (k == word.length - 1) return true; // 运行到这里，说明字符匹配，如果是最后一个，返回true
         board[i][j] = '\0'; // 把经过的点标记成空格，保证不会重新去遍历经过的点
         boolean res = dfs(board, word, i - 1, j, k + 1) || dfs(board, word, i + 1, j, k + 1) || 
@@ -133,6 +139,63 @@ class Solution {
    ```
 
    上面两种方法的时间复杂度都是O(mn)，都是遍历所有的坐标点。
+   
+3. 使用dfs遍历搜索所有节点
+
+   使用一个二维数组来记录访问过的坐标，走过的路径不需要重复走
+
+   ```java
+   class Solution {
+   
+       private int cnt;
+   
+       public int movingCount(int m, int n, int k) {
+           if (k == 0) {
+               return 1;
+           }
+           boolean[][] matrix = new boolean[m][n];
+           dfs(matrix, k, 0, 0);
+           // int cnt = 0;
+           // for (int i = 0;i < matrix.length;i++) {
+           //     for (int j = 0;j < matrix[0].length;j++) {
+           //         if (matrix[i][j] == true) {
+           //             cnt++;
+           //         }
+           //     }
+           // }
+           return cnt;
+       }
+   
+       private void dfs(boolean[][] matrix, int k, int i, int j) {
+           if (i < 0 || i >= matrix.length || j < 0 || j >= matrix[0].length || getSum(i, j) > k || matrix[i][j] == true) {
+               // 越界、坐标位数和超过k、或者已经访问过的坐标，不需要再继续探索它周围的坐标了
+               return;
+           }
+           // 可以到达的坐标标记为true，用于递归另一条路径的时候，不需要再重复访问走过的节点
+           matrix[i][j] = true;
+           cnt++;
+           dfs(matrix, k, i - 1, j);
+           dfs(matrix, k, i + 1, j);
+           dfs(matrix, k, i, j - 1);
+           dfs(matrix, k, i, j + 1);
+       }
+   
+       private int getSum(int i, int j) {
+           return calSum(i) + calSum(j);
+       }
+   
+       private int calSum(int k) {
+           int res = 0;
+           while (k != 0) {
+               res += k % 10;
+               k /= 10;
+           }
+           return res;
+       }
+   }
+   ```
+
+   
 
 # Hot100-46. 全排列
 
@@ -293,7 +356,7 @@ class Solution {
 逻辑：保证括号匹配
 
 * 左括号剩余的数量 >= 右括号时，只能添加左括号
-* 左括号剩余的数量 <   右括号时，可以添加左括号，也可以添加右括号
+* 左括号剩余的数量  <   右括号时，可以添加左括号，也可以添加右括号
 
 **主要是注意递归的写法：**如何把上面两种情况全部考虑进去
 
@@ -315,7 +378,7 @@ class Solution {
             res.add(combination.toString());
             return;
         }
-        if (remainLeft >= 0) { // 两种情况左括号都可以添加，所以先添加左括号，递归结束后，回溯删除组合中的当前字符
+        if (remainLeft > 0) { // 两种情况左括号都可以添加，所以先添加左括号，递归结束后，回溯删除组合中的当前字符
             combination.append('(');
             helper(res, remainLeft - 1, remainRight, combination);
             combination.deleteCharAt(combination.length() - 1);
@@ -363,7 +426,7 @@ class Solution {
             tmp.pollLast();
         }
     }
-}
+}q
 ```
 
 
