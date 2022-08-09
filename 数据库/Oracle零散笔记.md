@@ -61,3 +61,72 @@ CONNECT BY PRIOR ID=PARENT_ID;
 PARENT_ID是ID的子节点，NAME = 'Forcast' 是第一行根节点，根据指定的 PARENT_ID = ID 这种层级关系，来递归查询子节点
 
 ![image-20210513105620321](Oracle零散笔记.assets/image-20210513105620321.png)
+
+
+
+# Left join和Where谁先执行
+
+Left join时，先使用ON的条件生成临时表（left join，无论条件是否为真，都返回左表中的记录），然后再使用WHERE对临时表的内容进行筛选（此时不再有left join的概念）。
+
+
+
+# 存储过程
+
+## 代码块结构
+
+XXXX  **IS**
+
+**BEGIN**
+
+处理过程逻辑
+
+**EXCEPTION**
+
+**END**
+
+
+
+# 变量定义
+
+**针对存储过程的变量定义，不需要DECLAREA声明**
+
+1. 变量名 表明.字段名%TYPE；  新变量与指定变量类型一致
+2. 变量名 变量类型；
+3. 变量名 表明%ROWTYPE； 新变量的数据类型与指定表的指定行记录（所有字段）的类型一致
+
+
+
+# 变量赋值
+
+1. 对于前两种命名方式可以直接使用 `:=` 赋值，比如 `V_CLO := 1`，也可以在变量声明的时候同时赋值
+
+2. SELECT XXX INTO 变量名
+
+3. execute immediate sql语句字符串 into 变量 
+
+   ![image-20220801110847320](Oracle零散笔记.assets/image-20220801110847320.png)
+
+
+
+# Oracle Schema和User（用户）的区别
+
+User（用户）是用来找到Schema的，Schema包含数据库对象，比如表、分区、视图、索引、包、存储过程、函数、触发器、类型、序列和同义等。
+
+![image-20220801162216201](Oracle零散笔记.assets/image-20220801162216201.png)
+
+# Oracle中分区概念
+
+**表空间：**
+
+表空间指的是一个或多个数据文件的集合，所有的数据对象都存放在指定的表空间中，但主要存放的是表， 所以称作表空间。
+　　通俗来讲，数据库（一套房子，可以有多个房间），表空间（房间），数据库文件（房间中的书架），表（书架上的书）。
+
+
+
+**分区表：**
+
+当表中的数据量不断增大，查询数据的速度就会变慢，应用程序的性能就会下降，这时就应该考虑对表进行分区。表进行分区后，即分区表，逻辑上表仍然是一张完整的表，只是将表中的数据在物理上存放到多个表空间(物理文件上)，这样查询数据时，不至于每次都扫描整张表。
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200807094743911.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTcyODc2,size_16,color_FFFFFF,t_70)
