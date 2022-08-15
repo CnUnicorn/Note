@@ -130,3 +130,11 @@ User（用户）是用来找到Schema的，Schema包含数据库对象，比如�
 
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200807094743911.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0OTcyODc2,size_16,color_FFFFFF,t_70)
+
+
+
+# NVL与NVL2的区别
+
+NVL(E1, E2)，如果E1为空，那么返回E2；E1不为空返回E1
+
+NVL2（E1， E2， E3），如果E1为空，那么返回E3；E1不为空返回E2

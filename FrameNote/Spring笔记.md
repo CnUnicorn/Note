@@ -849,6 +849,7 @@ public class People {
 * 都是用来自动装配的，都可以放在属性字段上
 * `@Autowired`默认通过byType的方式实现，如果有相同的类型，再通过byName实现，而且必须要求这个自动装配的属性在容器中存在【常用】
 * `@Resource`默认通过byName的方式实现，如果找不到名字，则通过byType的方式实现。如果两者都找不到的情况下，就报错【常用】。
+* 当一个接口存在多个实现类的情况下，`@Autowired` 和`@Resource`都需要通过名称才能正确匹配到对应的 Bean。`Autowired` 可以通过 `@Qualifier` 注解来显示指定名称，`@Resource`可以通过 `name` 属性来显示指定名称。
 
 
 
