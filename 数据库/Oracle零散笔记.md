@@ -138,3 +138,78 @@ User（用户）是用来找到Schema的，Schema包含数据库对象，比如�
 NVL(E1, E2)，如果E1为空，那么返回E2；E1不为空返回E1
 
 NVL2（E1， E2， E3），如果E1为空，那么返回E3；E1不为空返回E2
+
+
+
+# 当查询没有结果时
+
+当查询没有结果时，可以理解成返回一个空的列表，不会返回NULL，所以这个时候用NVL判断是无效的。
+
+如果结果只需要一个，且查询为空的时候需要判断是否有返回，可以使用聚合函数（Trick）
+
+**聚合函数一定会返回一个值，是期望的返回值或者NULL**
+
+
+
+# 四个排序函数
+
+Oracle中有四个常用的排序函数
+
+* rank函数（相同大小排名相同，但是下一个排名从当前行数开始，排名不连续）
+* dense_rank函数（相同大小排名相同，排名连需）
+* row_number函数（从1开始标上序号）
+* ntile(n)函数（讲数据尽可能均匀地分到参数n个桶中，每个桶标上序号，从1开始）
+
+```sql
+create table scores
+(   id number(6)
+   ,score number(4,2)
+);
+insert into scores values(1,3.50);
+insert into scores values(2,3.65);
+insert into scores values(3,4.00);
+insert into scores values(4,3.85);
+insert into scores values(5,4.00);
+insert into scores values(6,3.65);
+commit;
+
+select
+    id 
+   ,score
+   ,rank() over(order by score desc) rank               --按照成绩排名，纯排名
+   ,dense_rank() over(order by score desc) dense_rank   --按照成绩排名，相同成绩排名一致
+   ,row_number() over(order by score desc) row_number   --按照成绩依次排名
+   ,ntile(3) over (order by score desc) ntile         --按照分数划分成绩梯队，三个桶
+from scores;
+```
+
+![image-20220817153621539](Oracle零散笔记.assets/image-20220817153621539.png)
+
+
+
+# CROSS JOIN
+
+1. **交叉联结会让两张表数据两两组合（N X N 条数据）**
+
+   同一张表可以和自己联结
+
+![image-20220901110601403](Oracle零散笔记.assets/image-20220901110601403.png)
+
+<center>交叉联结</center>
+
+![image-20220901110616393](Oracle零散笔记.assets/image-20220901110616393.png)
+
+<center>交叉联结结果</center>
+
+
+
+![image-20220901110955839](Oracle零散笔记.assets/image-20220901110955839.png)
+
+```sql
+SELECT 
+        a.id AS id1, a.recordDate AS d1, a.Temperature AS t1, 
+        b.id AS id2, b.recordDate AS d2, b.Temperature AS t2
+FROM Weather a CROSS JOIN Weather b 
+WHERE a.recordDate - b.recordDate = 1
+```
+
