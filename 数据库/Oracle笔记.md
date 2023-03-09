@@ -213,3 +213,92 @@ FROM Weather a CROSS JOIN Weather b
 WHERE a.recordDate - b.recordDate = 1
 ```
 
+
+
+# 时间处理
+
+加法
+
+　　select sysdate,add_months(sysdate,12) from dual; --加1年
+
+　　select sysdate,add_months(sysdate,1) from dual; --加1月
+
+　　select sysdate,to_char(sysdate+7,'yyyy-mm-dd HH24:MI:SS') from dual; --加1星期
+
+　　select sysdate,to_char(sysdate+1,'yyyy-mm-dd HH24:MI:SS') from dual; --加1天
+
+　　select sysdate,to_char(sysdate+1/24,'yyyy-mm-dd HH24:MI:SS') from dual; --加1小时
+
+　　select sysdate,to_char(sysdate+1/24/60,'yyyy-mm-dd HH24:MI:SS') from dual; --加1分钟
+
+　　select sysdate,to_char(sysdate+1/24/60/60,'yyyy-mm-dd HH24:MI:SS') from dual; --加1秒
+
+　　减法
+
+　　select sysdate,add_months(sysdate,-12) from dual; --减1年
+
+　　select sysdate,add_months(sysdate,-1) from dual; --减1月
+
+　　select sysdate,to_char(sysdate-7,'yyyy-mm-dd HH24:MI:SS') from dual; --减1星期
+
+　　select sysdate,to_char(sysdate-1,'yyyy-mm-dd HH24:MI:SS') from dual; --减1天
+
+　　select sysdate,to_char(sysdate-1/24,'yyyy-mm-dd HH24:MI:SS') from dual; --减1小时
+
+　　select sysdate,to_char(sysdate-1/24/60,'yyyy-mm-dd HH24:MI:SS') from dual; --减1分钟
+
+　　select sysdate,to_char(sysdate-1/24/60/60,'yyyy-mm-dd HH24:MI:SS') from dual; --减1秒
+
+　　Oracle关于时间/日期的操作
+
+　　1.日期时间间隔操作
+
+　　当前时间减去7分钟的时间
+
+　　select sysdate,sysdate - interval '7' MINUTE from dual
+
+　　当前时间减去7小时的时间
+
+​        select sysdate - interval '7' hour from dual
+
+　　当前时间减去7天的时间
+
+　　select sysdate - interval '7' day from dual
+
+　　当前时间减去7月的时间
+
+　　select sysdate,sysdate - interval '7' month from dual
+
+　　当前时间减去7年的时间
+
+　　select sysdate,sysdate - interval '7' year from dual
+
+　　时间间隔乘以一个数字
+
+　　select sysdate,sysdate - 8 *interval '2' hour from dual
+
+　　2.日期到字符操作
+
+　　select sysdate,to_char(sysdate,'yyyy-mm-dd hh24:mi:ss') from dual
+
+　　select sysdate,to_char(sysdate,'yyyy-mm-dd hh:mi:ss') from dual
+
+　　select sysdate,to_char(sysdate,'yyyy-ddd hh:mi:ss') from dual
+
+　　select sysdate,to_char(sysdate,'yyyy-mm iw-d hh:mi:ss') from dual
+
+　　参考oracle的相关关文档(ORACLE901DOC/SERVER.901/A90125/SQL_ELEMENTS4.HTM#48515)
+
+　　3. 字符到日期操作
+
+　　select to_date('2003-10-17 21:15:37','yyyy-mm-dd hh24:mi:ss') from dual
+
+　　具体用法和上面的to_char差不多。
+
+　　4. trunk/ ROUND函数的使用
+
+　　select trunc(sysdate ,'YEAR') from dual（'YEAR'时间截取为当年第一天，'DAY'时间截取为上周日，'MONTH'时间截取为本月第一天）
+
+　　select trunc(sysdate ) from dual   （截取到当日，去掉时分秒）
+
+　　select to_char(trunc(sysdate ,'YYYY'),'YYYY') from dual

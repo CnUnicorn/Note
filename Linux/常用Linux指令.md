@@ -189,7 +189,32 @@ chmod o+t /home/public      #设置一个文件的 STIKY 位 - 只允许合法�
 chmod o-t /home/public      #禁用一个目录的 STIKY 位
 ```
 
+chmod（英文全拼：change mode）命令是控制用户对文件的权限的命令。
 
+Linux/Unix 的文件调用权限分为三级 : 文件所有者（Owner）、用户组（Group）、其它用户（Other Users）。
+
+![1.jpg](https://img.php.cn/upload/image/126/744/814/1640072647495756.jpg)
+
+```
+rwx对应权限：
+r -> 4
+w -> 2
+x -> 1
+
+使用数字修改权限：
+chmod -R 权限值 文件名  （-R表示文件夹以及子目录中的所有文件设置成相同的权限）
+chmod -R 777 text.txt
+77 对应 rwxrwxrwx
+
+使用字母修改权限：
+文件的基本权限就是 3 种用户身份（所有者（u）、所属组（g）和其他人（o））搭配 3 种权限（rwx），
+chmod 命令中用 u、g、o 分别代表 3 种身份，还用 a 表示全部的身份（all 的缩写）。
+另外，chmod 命令仍使用 r、w、x 分别表示读、写、执行权限。并使用+-表示添加删除权限
+命令如下：
+chmod 身份+-权限 文件/文件夹（-R）
+```
+
+![1.gif](https://img.php.cn/upload/image/803/328/419/1640072716130228.gif)
 
 # 10.文件的特殊属性
 
@@ -210,6 +235,8 @@ lsattr           #显示特殊的属性
 
 # 11. 打包和压缩文件
 
+tar是打包，不是压缩
+
 ```
 bunzip2 file1.bz2   #解压一个叫做 'file1.bz2'的文件
 bzip2 file1         #压缩一个叫做 'file1' 的文件
@@ -222,17 +249,26 @@ rar a file1.rar file1 file2 dir1   #同时压缩 'file1', 'file2' 以及目录 '
 rar x file1.rar     #解压rar包
 unrar x file1.rar   #解压rar包
 
-tar -cvf archive.tar file1   #创建一个非压缩的 tarball
+-c 建立新的压缩文件
+-C 指定解压目录，该目录必须存在
+-x 从压缩的文件中提取文件
+-j 支持bzip2解压文件
+-f 指定压缩文件
+-v 显示操作过程
+-z 支持g[zip解压]
+
+tar -cvf archive.tar file1   #创建一个非压缩的 tarball，加上z就是gizp压缩
 tar -cvf archive.tar file1 file2 dir1  #创建一个包含了 'file1', 'file2' 以及 'dir1'的档案文件
 tar -tf archive.tar    #显示一个包中的内容
 tar -xvf archive.tar   #释放一个包
-tar -xvf archive.tar -C /tmp       #将压缩包释放到 /tmp目录下
+tar -xvf archive.tar -C /tmp       #将压缩包释放到 /tmp目录下，目录必须存在
 tar -cvfj archive.tar.bz2 dir1     #创建一个bzip2格式的压缩包
 tar -jxvf archive.tar.bz2          #解压一个bzip2格式的压缩包
 tar -cvfz archive.tar.gz dir1      #创建一个gzip格式的压缩包
 
 tar -zcvf archive.tar.gz test.txt  #压缩文件,tar -zcvf 压缩后的文件名 目标文件名
-tar -zxvf archive.tar.gz           #解压一个gzip格式的压缩包
+tar -zxvf archive.tar.gz           #解压一个gzip格式的压缩包，解压到同级目录下
+tar -zxvf archive.tar.gz -C [文件目录] #解压到指定目录，目录必须存在
 
 zip file1.zip file1    #创建一个zip格式的压缩包
 zip -r file1.zip file1 file2 dir1    #将几个文件和目录同时压缩成一个zip格式的压缩包
