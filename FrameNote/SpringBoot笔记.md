@@ -715,7 +715,7 @@ spring.profiles.active=dev
 
 不同目录下的application.properties优先级不同。
 
-优先级顺序，从高到低：
+优先级顺序，从高到低（classpath*:**/*.xml，**classpath***表示加载多个文件）：
 
 1. `file:./config/`                                         项目路径下的config文件夹中的配置文件
 
