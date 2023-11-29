@@ -136,6 +136,8 @@ mount -t smbfs -o username=user,password=pass //WinClient/share /mnt/share      
 df -h           #显示已经挂载的分区列表
 ls -lSr |more    #以尺寸大小排列文件和目录
 du -sh dir1      #估算目录 'dir1' 已经使用的磁盘空间'
+du -d1 -h        #估算当前目录所有文件夹的大小
+du -d2 -h        #向下递归两层，展示当前目录下和下层目录所有的
 du -sk * | sort -rn     #以容量大小为依据依次显示文件和目录的大小
 rpm -q -a --qf '%10{SIZE}t%{NAME}n' | sort -k1,1n 
 #以大小为依据依次显示已安装的rpm包所使用的空间 (fedora, redhat类系统)
@@ -187,6 +189,7 @@ chmod g+s /home/public      #设置一个目录的SGID 位 - 类似SUID ，不�
 chmod g-s /home/public      #禁用一个目录的 SGID 位
 chmod o+t /home/public      #设置一个文件的 STIKY 位 - 只允许合法所有人删除文件
 chmod o-t /home/public      #禁用一个目录的 STIKY 位
+chmod -R 777 /logs          #为 logs 及其下的所有文件和子目录的所属者(u),所属组(g),其他用户(o)赋予所有权限，即可读(r)，可写(w)，可执行(x)权限；
 ```
 
 chmod（英文全拼：change mode）命令是控制用户对文件的权限的命令。

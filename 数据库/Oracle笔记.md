@@ -60,7 +60,7 @@ CONNECT BY PRIOR ID=PARENT_ID;
 
 PARENT_ID是ID的子节点，NAME = 'Forcast' 是第一行根节点，根据指定的 PARENT_ID = ID 这种层级关系，来递归查询子节点
 
-![image-20210513105620321](Oracle零散笔记.assets/image-20210513105620321.png)
+![image-20210513105620321](Oracle笔记.assets/image-20210513105620321.png)
 
 
 
@@ -104,7 +104,7 @@ XXXX  **IS**
 
 3. execute immediate sql语句字符串 into 变量 
 
-   ![image-20220801110847320](Oracle零散笔记.assets/image-20220801110847320.png)
+   ![image-20220801110847320](Oracle笔记.assets/image-20220801110847320.png)
 
 
 
@@ -112,7 +112,7 @@ XXXX  **IS**
 
 User（用户）是用来找到Schema的，Schema包含数据库对象，比如表、分区、视图、索引、包、存储过程、函数、触发器、类型、序列和同义等。
 
-![image-20220801162216201](Oracle零散笔记.assets/image-20220801162216201.png)
+![image-20220801162216201](Oracle笔记.assets/image-20220801162216201.png)
 
 # Oracle中分区概念
 
@@ -183,7 +183,7 @@ select
 from scores;
 ```
 
-![image-20220817153621539](Oracle零散笔记.assets/image-20220817153621539.png)
+![image-20220817153621539](Oracle笔记.assets/image-20220817153621539.png)
 
 
 
@@ -193,17 +193,17 @@ from scores;
 
    同一张表可以和自己联结
 
-![image-20220901110601403](Oracle零散笔记.assets/image-20220901110601403.png)
+![image-20220901110601403](Oracle笔记.assets/image-20220901110601403.png)
 
 <center>交叉联结</center>
 
-![image-20220901110616393](Oracle零散笔记.assets/image-20220901110616393.png)
+![image-20220901110616393](Oracle笔记.assets/image-20220901110616393.png)
 
 <center>交叉联结结果</center>
 
 
 
-![image-20220901110955839](Oracle零散笔记.assets/image-20220901110955839.png)
+![image-20220901110955839](Oracle笔记.assets/image-20220901110955839.png)
 
 ```sql
 SELECT 
@@ -302,3 +302,59 @@ WHERE a.recordDate - b.recordDate = 1
 　　select trunc(sysdate ) from dual   （截取到当日，去掉时分秒）
 
 　　select to_char(trunc(sysdate ,'YYYY'),'YYYY') from dual
+
+
+
+# 删除表空间
+
+**DROP TABLESPACE XXX**;
+
+如果表空间还有数据: **DROP TABLESPACE XXX INCLUDING CONTENTS**(删除表空间数据)
+
+如果还需要一起删掉物理文件：**DROP TABLESPACE XXX INCLUDING CONTENTS AND DATAFILES**
+
+
+
+# join中筛选条件放在on和where中的区别
+
+如果是inner join，筛选条件放在on和where中没有区别。
+
+如果是outer join（left join、right join、full join），会存在差别。
+
+​	外关联时：
+
+1. 首先根据on and条件筛选生成临时表
+2. 再用筛选后的临时表关联
+3. 最后在关联后的结果上进行where筛选
+
+举例：
+
+```
+表A
+ID NAME
+1  小明
+2  小王
+3  小张
+
+表B
+ID AGE
+1  18
+2  14
+3  15
+
+SELECT * FROM A LEFT JOIN B ON A.ID = B.ID AND B.ID <> 1
+# 先通过on条件对B表的内容进行筛选，A表左关联后对应B表的结果为空
+查询结果：
+A.ID NAME B.ID  AGE
+1    小明  null  null
+2    小王   2    14
+3    小张   3    15
+
+SELECT * FROM A LEFT JOIN B ON A.ID = B.ID WHERE B.ID <> 1
+# 先关联后，再筛选数据，直接筛掉了这一行数据
+查询结果：
+A.ID NAME B.ID AGE
+2    小王   2   14
+3    小张   3   15
+```
+
