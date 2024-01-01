@@ -60,7 +60,7 @@ Spring的web框架围绕DispatcherServlet设计。DispatcherServlet的作用是�
 
 ​	Spring MVC框架像许多其他MVC框架一样, **以请求为驱动** , **围绕一个中心Servlet分派请求及提供其他功能**，**DispatcherServlet是一个实际的Servlet (它继承自HttpServlet 基类)**。
 
-<img src="E:\typora\笔记图片\SpringMVC笔记\微信图片_20200730103214.png" alt="微信图片_20200730103214" style="zoom:80%;" />
+<img src="E:\Note\FrameNote\笔记图片\SpringMVC笔记\微信图片_20200730103214.png" alt="微信图片_20200730103214" style="zoom:80%;" />
 
 
 
