@@ -92,3 +92,153 @@ df = pandas.DataFrame({'A': [1, 2, 3, 4, 5],
    ```
 
    
+
+
+
+## 3、pandas.merge
+
+`pandas.merge()` 方法用于将两个 DataFrame 合并，类似于 SQL 中的 JOIN 操作。该方法提供了多种连接方式，可以根据需要选择连接的列和方式。以下是 `pandas.merge()` 方法的参数和使用示例：
+
+`pandas.merge()` 方法的主要参数：
+
+- **left**：左侧 DataFrame。
+
+- **right**：右侧 DataFrame。
+
+- how
+
+  ：指定连接方式，可以是以下值之一：
+
+  - `'left'`：左连接（保留左侧 DataFrame 的所有行）。
+  - `'right'`：右连接（保留右侧 DataFrame 的所有行）。
+  - `'outer'`：外连接（保留左右两侧 DataFrame 的所有行）。
+  - `'inner'`：内连接（仅保留左右两侧 DataFrame 都有的行）。
+
+- **on**：指定连接的列名。该列名在两个 DataFrame 中必须都存在。
+
+- **left_on**：左侧 DataFrame 中用作连接键的列。
+
+- **right_on**：右侧 DataFrame 中用作连接键的列。
+
+- **left_index**：如果为 True，使用左侧 DataFrame 的索引作为连接键。
+
+- **right_index**：如果为 True，使用右侧 DataFrame 的索引作为连接键。
+
+- **sort**：排序合并的数据，默认为 True。
+
+- **suffixes**：字符串元组，用于附加到重叠列名的后缀，默认为 (`'_x'`, `'_y'`)。
+
+## 4、np.where 结合dataframe
+
+可以使用 `np.where` 替换 DataFrame 中某列满足某个条件的元素。
+
+```python
+import pandas as pd
+import numpy as np
+
+# 创建一个示例 DataFrame
+data = {
+    'A': [10, 20, 30, 40, 50],
+    'B': [1, 2, 3, 4, 5]
+}
+df = pd.DataFrame(data)
+
+print("原始 DataFrame:")
+print(df)
+
+# 使用 np.where 替换 DataFrame 中某列满足条件的元素
+df['A'] = np.where(df['A'] > 25, 'High', 'Low')
+
+print("\n替换后的 DataFrame:")
+print(df)
+
+```
+
+输出：
+
+```
+原始 DataFrame:
+    A  B
+0  10  1
+1  20  2
+2  30  3
+3  40  4
+4  50  5
+
+替换后的 DataFrame:
+      A  B
+0   Low  1
+1   Low  2
+2  High  3
+3  High  4
+4  High  5
+
+```
+
+
+
+## 5、实现SQL中的开窗
+
+```sql
+SELECT key1, key2, value1, value2
+       , row_number() over(partition by key1, key2 order by value1 desc, value2 desc) as rn
+FROM test_table
+```
+
+
+
+```python
+import pandas as pd
+
+data = {
+    'key1': ['A', 'A', 'A', 'B', 'B', 'B'],
+    'key2': ['X', 'X', 'Y', 'Y', 'Y', 'Z'],
+    'value1': [10, 20, 30, 40, 50, 60],
+    'value2': [5, 15, 25, 35, 45, 55]
+}
+
+df = pd.DataFrame(data)
+print("原始 DataFrame:")
+print(df)
+
+  key1 key2  value1  value2
+0    A    X      10       5
+1    A    X      20      15
+2    A    Y      30      25
+3    B    Y      40      35
+4    B    Y      50      45
+5    B    Z      60      55
+
+```
+
+
+
+pandas实现以上SQL，可用以下两种方式：
+
+**生成新的DataFrame**
+
+```python
+# 按 value1 和 value2 降序排序
+df_sorted = df.sort_values(by=['key1', 'key2', 'value1', 'value2'], ascending=[True, True, False, False])
+
+# 添加 row_number
+df_sorted['rn'] = df_sorted.groupby(['key1', 'key2']).cumcount() + 1
+
+print("\n添加 row_number 列后的 DataFrame:")
+print(df_sorted)
+
+```
+
+**不改变原来DataFrame的顺序**
+
+```python
+# 如果想保持原始 DataFrame 的顺序，可以在排序和计算行号之后重新排序回原始顺序
+# 保持原始顺序
+df['rn'] = df.sort_values(by=['key1', 'key2', 'value1', 'value2'], ascending=[True, True, False, False]) \
+             .groupby(['key1', 'key2']).cumcount() + 1
+
+print("\n保持原始顺序的 DataFrame:")
+print(df)
+
+```
+
