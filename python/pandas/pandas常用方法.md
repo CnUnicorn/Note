@@ -242,3 +242,17 @@ print(df)
 
 ```
 
+## 6、时间转换
+
+```python
+# 这里统一使用datetime.datetime
+
+# 字符串转换成时间
+str2time = datetime.datetime.strptime('2023-03-25 12:07:01', '%Y-%m-%d %H:%M:%S')
+# 得到datetime时间datetime.datetime(2023, 2, 5, 12, 7, 1)
+
+# datetime时间个格式化成指定字符串形式
+str2time.strftime('%Y-%m-%d')
+# 得到指定格式的时间字符，2023-03-25
+
+```
