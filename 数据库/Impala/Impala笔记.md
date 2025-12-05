@@ -19,4 +19,3 @@ select unix_timestamp('2022/03/02 10:10:30.000000', 'yyyy/MM/dd HH:mm:ss.SSSSSS'
 select from_unixtime(1, 'yyyy/MM/dd HH:mm:ss.SSSSSS')  -- unixtime转换成指定格式的字符串，如果没有指定字符串格式，默认格式是yyyy-MM-dd HH:mm:ss.SSSSSS
 
 ```
-
